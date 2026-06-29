@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Medurun Driver — Prototype</title>
+<style>
+  /* ============ DESIGN TOKENS ============ */
+  :root {
+    --purple-700: #5B21B6;
+    --purple-600: #6D28D9;
+    --purple-500: #7C3AED;  /* primary */
+    --purple-400: #9461F5;
+    --purple-100: #EDE7FB;
+    --purple-50:  #F6F2FE;
+    --ink-900:    #14121A;
+    --ink-700:    #2C2836;
+    --ink-500:    #6B6577;
+    --ink-300:    #A8A2B6;
+    --line:       #ECE9F2;
+    --white:      #FFFFFF;
+
+    --radius-input: 14px;
+    --radius-btn:   14px;
+    --radius-card:  16px;
+    --shadow-btn:   0 8px 18px -14px rgba(124, 58, 237, 0.14);
+    --shadow-soft:  0 18px 50px -20px rgba(92, 33, 182, 0.45);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+  /* ============ DEMO CONTROL PANEL (prototype only — outside phone) ============ */
+  #demo {
+    position: fixed; top: 0; right: 0; height: 100vh; width: 248px;
+    background: #16131F; color: #fff; z-index: 999;
+    display: flex; flex-direction: column;
+    box-shadow: -12px 0 40px -18px rgba(0,0,0,.55);
+    transform: translateX(0); transition: transform .3s cubic-bezier(.16,1,.3,1);
+    font-family: "Inter", sans-serif;
+  }
+  #demo.collapsed { transform: translateX(248px); }
+  #demoToggle {
+    position: absolute; top: 18px; left: -38px;
+    width: 38px; height: 42px; border: none; cursor: pointer;
+    background: #16131F; color: #fff;
+    border-radius: 11px 0 0 11px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: -6px 0 18px -8px rgba(0,0,0,.5);
+  }
+  #demoToggle svg { width: 18px; height: 18px; transition: transform .3s; }
+  #demo.collapsed #demoToggle svg { transform: rotate(180deg); }
+  .demo-head { padding: 18px 18px 14px; border-bottom: 1px solid #2A2636; }
+  .demo-head .t { font-size: 13px; font-weight: 700; letter-spacing: .02em; }
+  .demo-head .s { font-size: 10.5px; color: #8A82A0; margin-top: 3px; letter-spacing: .04em; text-transform: uppercase; }
+  .demo-body { flex: 1; overflow-y: auto; padding: 12px 14px 24px; }
+  .demo-body::-webkit-scrollbar { width: 6px; }
+  .demo-body::-webkit-scrollbar-thumb { background: #2A2636; border-radius: 99px; }
+  .demo-sec { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #6E6786; margin: 16px 4px 8px; }
+  .demo-sec:first-child { margin-top: 4px; }
+  .demo-btn {
+    width: 100%; text-align: left; border: none; cursor: pointer;
+    background: #211D2E; color: #D9D4E6;
+    font-size: 12.5px; font-weight: 600; font-family: inherit;
+    padding: 9px 12px; border-radius: 9px; margin-bottom: 6px;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    transition: background .15s, color .15s;
+  }
+  .demo-btn:hover { background: #2C2740; color: #fff; }
+  .demo-btn.active { background: var(--purple-500); color: #fff; box-shadow: 0 6px 16px -8px rgba(124,58,237,.8); }
+  .demo-btn .soon { font-size: 8.5px; font-weight: 700; letter-spacing: .04em; color: #8A82A0; background: #14111C; padding: 2px 6px; border-radius: 99px; }
+  .demo-btn.active .soon { color: #EADCFB; background: rgba(255,255,255,.18); }
+
+  body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #E9E6F0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px; /* equal whitespace; demo panel clears phone on desktop */
+  }
+
+  /* ============ PHONE FRAME ============ */
+  .phone {
+    width: 372px;
+    height: 806px;
+    background: var(--white);
+    border-radius: 46px;
+    box-shadow: 0 30px 64px -28px rgba(20, 18, 26, 0.5);
+    position: relative;
+    overflow: hidden;
+    border: 9px solid #0e0c14;
+    /* scale whole device down ~18% so 100% zoom matches the old 80% view */
+    transform: scale(0.82);
+    transform-origin: center center;
+    /* collapse the reserved layout box to the scaled size (fit + true centering) */
+    margin: -72px -33px;
+  }
+  .notch {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 130px; height: 28px;
+    background: #0e0c14;
+    border-bottom-left-radius: 17px;
+    border-bottom-right-radius: 17px;
+    z-index: 50;
+  }
+
+  /* ============ SCREEN ROUTER ============ */
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+  }
+  .screen.active {
+    display: flex;
+    animation: fade 0.35s ease both;
+  }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+  /* shared padded body for form-type screens */
+  .pad { padding: 52px 24px 26px; flex: 1; display: flex; flex-direction: column; }
+  .spacer { flex: 1; }
+
+  /* ============ REUSABLE: BRAND MARK ============ */
+  .mark {
+    border-radius: 13px;
+    background: linear-gradient(150deg, var(--purple-500) 0%, var(--purple-700) 100%);
+    box-shadow: 0 10px 22px -10px rgba(124,58,237,0.6);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .mark svg { width: 60%; height: 60%; }
+
+  .topmark { display: flex; align-items: center; gap: 10px; margin-bottom: 26px; }
+  .topmark .mark { width: 38px; height: 38px; border-radius: 12px; }
+  .topmark .name { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink-900); }
+  .topmark .name span, .wordmark span { color: var(--purple-500); }
+
+  /* ============ REUSABLE: HEADINGS ============ */
+  .heading h2 { font-size: 34px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.15; color: var(--ink-900); }
+  .heading p  { margin-top: 10px; font-size: 15px; line-height: 1.5; color: var(--ink-500); font-weight: 400; }
+
+  /* ============ REUSABLE: INPUTS ============ */
+  .label { font-size: 13px; font-weight: 500; color: var(--ink-700); margin-bottom: 8px; letter-spacing: 0.01em; }
+  .field {
+    width: 100%; height: 48px;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-input);
+    padding: 0 14px;
+    font-size: 15px; font-weight: 600; color: var(--ink-900);
+    outline: none; background: var(--white);
+    transition: border-color 0.18s, box-shadow 0.18s;
+  }
+  .field::placeholder { color: var(--ink-300); font-weight: 500; font-size: 15px; }
+  .field:focus { border-color: var(--purple-500); box-shadow: 0 0 0 4px var(--purple-50); }
+
+  .phone-input { display: flex; gap: 10px; }
+  .cc {
+    display: flex; align-items: center; gap: 7px;
+    padding: 0 14px; height: 48px;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-input);
+    background: var(--white);
+    font-size: 15px; font-weight: 600; color: var(--ink-900);
+    flex-shrink: 0; cursor: pointer;
+  }
+  .cc .flag { font-size: 17px; }
+  .cc .chev { width: 13px; height: 13px; color: var(--ink-300); }
+  .num { letter-spacing: 0.04em; }
+  .hint { margin-top: 8px; font-size: 12px; color: var(--ink-300); padding-left: 2px; }
+
+  /* ============ REUSABLE: BUTTONS ============ */
+  .btn {
+    width: 100%; height: 46px; border: none; padding: 0 16px;
+    border-radius: var(--radius-btn);
+    background: linear-gradient(180deg, var(--purple-500) 0%, var(--purple-600) 100%);
+    color: var(--white); font-size: 16px; font-weight: 600;
+    cursor: pointer; box-shadow: var(--shadow-btn);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .btn:active { transform: translateY(1px) scale(0.995); box-shadow: 0 8px 18px -10px rgba(124,58,237,0.5); }
+  .btn svg { width: 16px; height: 16px; }
+  .btn-ghost { background: none; box-shadow: none; color: var(--purple-600); }
+
+  /* ============ REUSABLE: BOTTOM / LINKS ============ */
+  .textlink { text-align: center; font-size: 15px; color: var(--ink-500); font-weight: 500; }
+  .textlink a { color: var(--purple-600); font-weight: 600; text-decoration: none; cursor: pointer; }
+  .terms { text-align: center; font-size: 12px; line-height: 1.6; color: #8A8A99; padding: 0 18px; }
+  .terms a { color: #8A8A99; font-weight: 600; text-decoration: none; }
+
+  /* ============ REUSABLE: TOP BAR / BACK ============ */
+  .topbar { display: flex; align-items: center; height: 56px; margin-bottom: 24px; }
+  .back {
+    width: 42px; height: 42px; border-radius: 13px;
+    border: 1.5px solid var(--line); background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--ink-900);
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .back:active { background: var(--purple-50); border-color: var(--purple-100); }
+  .back svg { width: 19px; height: 19px; }
+
+  /* ============ REUSABLE: STEPPER / SCROLL BODY ============ */
+  .scroll { flex: 1; overflow-y: auto; padding: 0 24px 14px; }
+  .scroll::-webkit-scrollbar { width: 0; }
+  .step-head { padding: 48px 24px 0; }
+  .stepper { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+  .stepper .track { flex: 1; height: 4px; border-radius: 99px; background: var(--line); overflow: hidden; }
+  .stepper .fill { height: 100%; background: linear-gradient(90deg, var(--purple-500), var(--purple-600)); border-radius: 99px; transition: width 0.4s ease; }
+  .stepper .count { font-size: 12px; font-weight: 700; color: var(--purple-600); white-space: nowrap; }
+
+  /* sticky bottom action bar */
+  .actionbar { padding: 12px 24px 22px; border-top: 1px solid var(--line); background: var(--white); }
+
+  /* ============ REUSABLE: FORM ROWS ============ */
+  .field-group { margin-bottom: 14px; }
+  .row2 { display: flex; gap: 12px; }
+  .row2 > * { flex: 1; min-width: 0; }
+  select.field { appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23A8A2B6' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='4 6 8 11 12 6'/></svg>"); background-repeat: no-repeat; background-position: right 16px center; padding-right: 42px; cursor: pointer; }
+  .field.sm { height: 44px; font-size: 14.5px; }
+  input.field[type=date] { font-weight: 500; color: var(--ink-700); }
+
+  /* segmented control (gender / ambulance type) */
+  .segmented { display: flex; gap: 7px; flex-wrap: wrap; }
+  .seg {
+    flex: 1; min-width: 58px; height: 42px;
+    border: 1.5px solid var(--line); border-radius: 10px;
+    background: var(--white); color: var(--ink-700);
+    font-size: 13.5px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .seg.on { border-color: var(--purple-500); background: var(--purple-50); color: var(--purple-700); }
+
+  /* ============ REUSABLE: DOC UPLOAD CARD ============ */
+  .doc-card {
+    border: 1.5px solid var(--line); border-radius: var(--radius-card);
+    padding: 15px; margin-bottom: 11px; background: var(--white);
+  }
+  .doc-top { display: flex; align-items: center; gap: 11px; margin-bottom: 13px; }
+  .doc-ico { width: 38px; height: 38px; border-radius: 11px; background: var(--purple-50); color: var(--purple-600); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .doc-ico svg { width: 19px; height: 19px; }
+  .doc-name { font-size: 14.5px; font-weight: 700; color: var(--ink-900); }
+  .doc-sub { font-size: 11.5px; color: var(--ink-300); font-weight: 500; margin-top: 1px; }
+  .badge-opt { margin-left: auto; font-size: 10px; font-weight: 700; color: var(--ink-500); background: var(--line); padding: 3px 8px; border-radius: 99px; letter-spacing: .03em; }
+
+  .upload-btn {
+    width: 100%; height: 46px; border-radius: 12px;
+    border: 1.6px dashed #CFC7E0; background: var(--purple-50);
+    color: var(--purple-600); font-size: 14px; font-weight: 650;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    cursor: pointer; transition: all 0.15s; margin-bottom: 0;
+  }
+  .upload-btn:active { transform: scale(0.99); }
+  .upload-btn svg { width: 17px; height: 17px; }
+  .upload-btn.done { border-style: solid; border-color: #BBE5C4; background: #EEF9F0; color: #1F9D4D; }
+
+  .doc-fields { display: none; }
+  .doc-fields.show { display: block; margin-top: 10px; }
+  .mini-label { font-size: 11px; font-weight: 600; color: var(--ink-500); margin-bottom: 5px; }
+
+  /* ============ REUSABLE: VEHICLE CARD ============ */
+  .veh-card { border: 1.5px solid var(--line); border-radius: var(--radius-card); padding: 15px; margin-bottom: 12px; }
+  .veh-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .veh-title { font-size: 16px; font-weight: 700; color: var(--ink-900); display: flex; align-items: center; gap: 9px; }
+  .veh-title .dot { width: 30px; height: 30px; border-radius: 9px; background: var(--purple-500); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+  .veh-remove { font-size: 12.5px; font-weight: 700; color: #D14343; cursor: pointer; }
+  .veh-docs-label { font-size: 11.5px; font-weight: 700; color: var(--ink-500); letter-spacing: .04em; text-transform: uppercase; margin: 4px 0 10px; }
+
+  .counter-pill { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; color: var(--purple-700); background: var(--purple-50); border: 1px solid var(--purple-100); padding: 8px 12px; border-radius: 11px; margin-bottom: 12px; }
+  .counter-pill svg { width: 15px; height: 15px; }
+  .add-veh { width: 100%; height: 48px; border-radius: 12px; border: 1.6px dashed #CFC7E0; background: var(--white); color: var(--purple-600); font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .add-veh:disabled { opacity: .45; cursor: not-allowed; }
+  .limit-note { margin-top: 12px; font-size: 12.5px; line-height: 1.5; color: #B45309; background: #FEF6E7; border: 1px solid #FAE3B5; border-radius: 12px; padding: 12px 14px; display: none; }
+  .limit-note.show { display: block; }
+
+  /* ============ REUSABLE: REVIEW SUMMARY ============ */
+  .sum-card { border: 1.5px solid var(--line); border-radius: var(--radius-card); padding: 15px; margin-bottom: 11px; }
+  .sum-top { display: flex; align-items: center; gap: 10px; margin-bottom: 11px; }
+  .sum-check { width: 24px; height: 24px; border-radius: 50%; background: #EEF9F0; color: #1F9D4D; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .sum-check svg { width: 14px; height: 14px; }
+  .sum-title { font-size: 14.5px; font-weight: 700; color: var(--ink-900); }
+  .sum-edit { margin-left: auto; font-size: 12.5px; font-weight: 700; color: var(--purple-600); cursor: pointer; }
+  .sum-row { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; padding: 4px 0; }
+  .sum-row .k { color: var(--ink-500); font-weight: 500; }
+  .sum-row .v { color: var(--ink-900); font-weight: 600; text-align: right; }
+  .primary-pick { margin-top: 12px; }
+  .primary-pick .opt { display: flex; align-items: center; gap: 11px; border: 1.5px solid var(--line); border-radius: 12px; padding: 11px 13px; margin-bottom: 9px; cursor: pointer; transition: all .15s; }
+  .primary-pick .opt.on { border-color: var(--purple-500); background: var(--purple-50); }
+  .primary-pick .radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--ink-300); flex-shrink: 0; position: relative; }
+  .primary-pick .opt.on .radio { border-color: var(--purple-500); }
+  .primary-pick .opt.on .radio::after { content: ''; position: absolute; inset: 3px; border-radius: 50%; background: var(--purple-500); }
+  .primary-pick .opt .pt { font-size: 14px; font-weight: 700; color: var(--ink-900); }
+  .primary-pick .opt .ps { font-size: 12px; color: var(--ink-500); margin-top: 1px; }
+
+  /* ============ SCREEN: SUCCESS ============ */
+  #reg-success { align-items: center; justify-content: center; text-align: center; padding: 28px; }
+  .success-ico { width: 92px; height: 92px; border-radius: 50%; background: linear-gradient(150deg, var(--purple-500), var(--purple-700)); box-shadow: var(--shadow-soft); display: flex; align-items: center; justify-content: center; margin-bottom: 26px; animation: pop 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+  .success-ico svg { width: 46px; height: 46px; }
+  @keyframes pop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
+  .success-ico .ring { position: absolute; width: 92px; height: 92px; border-radius: 50%; border: 2px solid var(--purple-200, #C9B6F5); animation: ringout 1.6s ease-out infinite; }
+  @keyframes ringout { 0% { transform: scale(1); opacity: .6; } 100% { transform: scale(1.5); opacity: 0; } }
+  #reg-success h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink-900); }
+  #reg-success p { margin-top: 12px; font-size: 14px; line-height: 1.6; color: var(--ink-500); padding: 0 8px; }
+
+  /* ============ REUSABLE: APP HEADER ============ */
+  .app-top { display: flex; align-items: center; gap: 12px; padding: 48px 24px 12px; }
+  .app-top .ttl { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink-900); }
+  .app-top .sub { font-size: 13px; color: var(--ink-500); margin-top: 2px; }
+  .app-top .right { margin-left: auto; display: flex; align-items: center; gap: 9px; }
+  .icon-btn { width: 42px; height: 42px; border-radius: 13px; border: 1.5px solid var(--line); background: var(--white); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ink-700); }
+  .icon-btn svg { width: 19px; height: 19px; }
+  .avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(150deg,var(--purple-400),var(--purple-700)); color: #fff; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+  /* app body that scrolls above bottom tab bar */
+  .app-body { flex: 1; overflow-y: auto; padding: 6px 24px 92px; }
+  .app-body::-webkit-scrollbar { width: 0; }
+
+  /* ============ REUSABLE: BOTTOM TAB BAR ============ */
+  .tabbar { position: absolute; bottom: 0; left: 0; right: 0; height: 70px; background: var(--white); border-top: 1px solid var(--line); display: flex; padding: 8px 10px 14px; z-index: 30; }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; color: var(--ink-300); font-size: 10.5px; font-weight: 600; }
+  .tab svg { width: 21px; height: 21px; }
+  .tab.on { color: var(--purple-600); }
+
+  /* ============ REUSABLE: CARDS / LISTS ============ */
+  .card { border: 1.5px solid var(--line); border-radius: var(--radius-card); padding: 15px; background: var(--white); margin-bottom: 11px; }
+  .card.flat { box-shadow: 0 8px 24px -16px rgba(20,18,26,.3); border-color: #F2EFF7; }
+  .sec-title { font-size: 14px; font-weight: 700; color: var(--ink-900); margin: 18px 2px 10px; display: flex; align-items: center; justify-content: space-between; }
+  .sec-title a { font-size: 12.5px; font-weight: 600; color: var(--purple-600); text-decoration: none; cursor: pointer; }
+
+  .list-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+  .list-row:last-child { border-bottom: none; }
+  .list-row .ico { width: 42px; height: 42px; border-radius: 12px; background: var(--purple-50); color: var(--purple-600); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .list-row .ico svg { width: 19px; height: 19px; }
+  .list-row .lr-main { flex: 1; min-width: 0; }
+  .list-row .lr-t { font-size: 15px; font-weight: 650; color: var(--ink-900); }
+  .list-row .lr-s { font-size: 12.5px; color: var(--ink-500); margin-top: 2px; }
+  .list-row .chev { color: var(--ink-300); width: 18px; height: 18px; flex-shrink: 0; }
+
+  /* ============ REUSABLE: STATUS BADGES (synced w/ Super Admin) ============ */
+  .badge { font-size: 10.5px; font-weight: 700; padding: 4px 9px; border-radius: 99px; letter-spacing: .01em; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
+  .badge.b-pending  { color: #B45309; background: #FEF6E7; }
+  .badge.b-verified { color: #1F9D4D; background: #EEF9F0; }
+  .badge.b-reupload { color: #C2410C; background: #FFF1EC; }
+  .badge.b-expiring { color: #B45309; background: #FEF6E7; }
+  .badge.b-expired  { color: #C0392B; background: #FDEDEC; }
+  .badge.b-online   { color: #1F9D4D; background: #EEF9F0; }
+  .badge.b-offline  { color: var(--ink-500); background: var(--line); }
+  .badge .dotmark { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  /* ============ REUSABLE: STAT GRID ============ */
+  .stat-grid { display: flex; gap: 12px; }
+  .stat { flex: 1; border: 1.5px solid var(--line); border-radius: 14px; padding: 14px; }
+  .stat .sv { font-size: 21px; font-weight: 800; color: var(--ink-900); letter-spacing: -0.02em; }
+  .stat .sl { font-size: 12px; color: var(--ink-500); margin-top: 3px; font-weight: 500; }
+
+  /* online toggle big card */
+  .go-card { border-radius: 18px; padding: 18px; margin-bottom: 14px; color: #fff; background: linear-gradient(150deg,var(--purple-500),var(--purple-700)); box-shadow: var(--shadow-soft); }
+  .go-card.off { background: linear-gradient(150deg,#3A3548,#211D2E); box-shadow: 0 18px 40px -22px rgba(20,18,26,.6); }
+  .go-card .gc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .go-card .gc-state { font-size: 17px; font-weight: 700; }
+  .go-card .gc-sub { font-size: 12.5px; opacity: .8; margin-top: 2px; }
+  .go-btn { width: 100%; height: 46px; border: none; border-radius: 13px; font-size: 14.5px; font-weight: 700; cursor: pointer; background: rgba(255,255,255,.16); color: #fff; backdrop-filter: blur(4px); }
+  .go-btn.on { background: #fff; color: var(--purple-700); }
+  .switch { width: 50px; height: 28px; border-radius: 99px; background: rgba(255,255,255,.25); position: relative; cursor: pointer; transition: background .2s; }
+  .switch.on { background: #fff; }
+  .switch::after { content:''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: left .2s; }
+  .switch.on::after { left: 25px; background: var(--purple-600); }
+  .go-card.off .switch::after { background: #fff; }
+
+  /* ============ REUSABLE: MAP + RIDE SHEET ============ */
+  .map { position: absolute; inset: 0; background:
+      linear-gradient(135deg, #EDEAF5 0%, #E5F0EC 100%);
+    overflow: hidden; }
+  .map::before { content:''; position: absolute; inset:0; background-image:
+      linear-gradient(rgba(124,58,237,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,58,237,.05) 1px, transparent 1px);
+    background-size: 38px 38px; }
+  .map .route { position: absolute; top: 22%; left: 18%; width: 60%; height: 46%; border: 0 solid; }
+  .map .route svg { width: 100%; height: 100%; overflow: visible; }
+  .map-pin { position: absolute; transform: translate(-50%,-100%); }
+  .map-pin .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+  .map-pin.start .pin-dot { background: var(--purple-500); }
+  .map-pin.end .pin-dot { background: #1F9D4D; }
+  .map-car { position: absolute; transform: translate(-50%,-50%); width: 38px; height: 38px; border-radius: 50%; background: #fff; box-shadow: 0 6px 18px -4px rgba(0,0,0,.3); display: flex; align-items: center; justify-content: center; color: var(--purple-600); }
+  .map-car svg { width: 20px; height: 20px; }
+
+  .ride-top { position: absolute; top: 46px; left: 16px; right: 16px; z-index: 5; display: flex; gap: 10px; }
+  .ride-pill { background: var(--white); border-radius: 13px; padding: 10px 14px; box-shadow: 0 10px 26px -14px rgba(20,18,26,.4); font-size: 13px; font-weight: 700; color: var(--ink-900); display: flex; align-items: center; gap: 8px; }
+  .ride-pill .k { color: var(--ink-500); font-weight: 500; font-size: 11px; }
+
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--white); border-radius: 24px 24px 0 0; padding: 18px 20px 24px; box-shadow: 0 -16px 40px -20px rgba(20,18,26,.35); z-index: 10; }
+  .sheet .grab { width: 38px; height: 4px; border-radius: 99px; background: var(--line); margin: -6px auto 14px; }
+  .sheet-h { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .sheet-h .avatar { width: 46px; height: 46px; font-size: 16px; }
+  .sheet-h .sh-t { font-size: 16px; font-weight: 700; color: var(--ink-900); }
+  .sheet-h .sh-s { font-size: 12px; color: var(--ink-500); margin-top: 1px; }
+  .sheet-h .sh-right { margin-left: auto; text-align: right; }
+  .sheet-h .sh-fare { font-size: 18px; font-weight: 800; color: var(--ink-900); }
+
+  .trip-line { display: flex; gap: 12px; padding: 4px 0; }
+  .trip-line .rail { display: flex; flex-direction: column; align-items: center; padding-top: 4px; }
+  .trip-line .rail .d { width: 11px; height: 11px; border-radius: 50%; }
+  .trip-line .rail .d.s { background: var(--purple-500); }
+  .trip-line .rail .d.e { background: #1F9D4D; }
+  .trip-line .rail .bar { width: 2px; flex: 1; background: var(--line); margin: 3px 0; min-height: 20px; }
+  .trip-line .tl-main { flex: 1; padding-bottom: 12px; }
+  .trip-line .tl-k { font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-300); }
+  .trip-line .tl-v { font-size: 13.5px; font-weight: 650; color: var(--ink-900); margin-top: 2px; line-height: 1.35; }
+
+  .type-tag { font-size: 10.5px; font-weight: 800; color: var(--purple-700); background: var(--purple-50); border: 1px solid var(--purple-100); padding: 3px 8px; border-radius: 7px; letter-spacing: .03em; }
+
+  .row-btns { display: flex; gap: 10px; margin-top: 16px; }
+  .btn.outline { background: none; box-shadow: none; color: var(--purple-600); border: 1.5px solid var(--purple-100); }
+  .btn.danger { background: linear-gradient(180deg,#EF5350,#D32F2F); box-shadow: 0 12px 26px -14px rgba(211,47,47,.6); }
+  .btn.sm { height: 44px; font-size: 14.5px; }
+
+  /* incoming ride countdown ring banner */
+  .incoming-banner { background: var(--purple-500); color: #fff; text-align: center; padding: 12px; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .incoming-banner .cd { background: rgba(255,255,255,.25); width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; }
+
+  /* ambulance pick (selection screen) */
+  .amb-opt { display: flex; align-items: center; gap: 13px; border: 1.5px solid var(--line); border-radius: 15px; padding: 15px; margin-bottom: 12px; cursor: pointer; transition: all .15s; }
+  .amb-opt.on { border-color: var(--purple-500); background: var(--purple-50); }
+  .amb-opt .amb-ico { width: 46px; height: 46px; border-radius: 12px; background: var(--purple-50); color: var(--purple-600); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .amb-opt.on .amb-ico { background: var(--purple-500); color: #fff; }
+  .amb-opt .amb-ico svg { width: 24px; height: 24px; }
+  .amb-opt .amb-num { font-size: 15px; font-weight: 700; color: var(--ink-900); }
+  .amb-opt .amb-meta { font-size: 12px; color: var(--ink-500); margin-top: 2px; }
+  .amb-opt .radio { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--ink-300); margin-left: auto; flex-shrink: 0; position: relative; }
+  .amb-opt.on .radio { border-color: var(--purple-500); }
+  .amb-opt.on .radio::after { content:''; position: absolute; inset: 3px; border-radius: 50%; background: var(--purple-500); }
+
+  /* status screen (pending/correction/approved) — reuse success shell */
+  .status-scr { align-items: center; justify-content: center; text-align: center; padding: 28px; }
+  .status-ico { width: 92px; height: 92px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+  .status-ico svg { width: 44px; height: 44px; color: #fff; }
+  .status-ico.amber { background: linear-gradient(150deg,#F6A609,#D9820A); box-shadow: 0 18px 40px -20px rgba(217,130,10,.6); }
+  .status-ico.purple { background: linear-gradient(150deg,var(--purple-500),var(--purple-700)); box-shadow: var(--shadow-soft); }
+  .status-ico.green { background: linear-gradient(150deg,#34C759,#1F9D4D); box-shadow: 0 18px 40px -20px rgba(31,157,77,.55); }
+  .status-scr h2 { font-size: 22px; font-weight: 700; color: var(--ink-900); letter-spacing: -0.02em; }
+  .status-scr p { margin-top: 12px; font-size: 14px; line-height: 1.6; color: var(--ink-500); padding: 0 6px; }
+  .status-steps { width: 100%; margin-top: 22px; text-align: left; }
+  .status-steps .st { display: flex; align-items: center; gap: 11px; padding: 9px 0; font-size: 13px; color: var(--ink-700); font-weight: 600; }
+  .status-steps .st .b { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .status-steps .st .b svg { width: 13px; height: 13px; }
+  .status-steps .st.done .b { background: #EEF9F0; color: #1F9D4D; }
+  .status-steps .st.active .b { background: var(--purple-50); color: var(--purple-600); }
+  .status-steps .st.wait .b { background: var(--line); color: var(--ink-300); }
+  .status-scr .actionbar2 { width: 100%; margin-top: 26px; }
+
+  /* profile */
+  .prof-head { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  .prof-head .avatar { width: 60px; height: 60px; font-size: 22px; }
+  .prof-head .ph-name { font-size: 18px; font-weight: 700; color: var(--ink-900); }
+  .prof-head .ph-meta { font-size: 12.5px; color: var(--ink-500); margin-top: 2px; }
+
+  /* ============ SCREEN: OTP ============ */
+  .edit-num { color: var(--purple-600); font-weight: 700; text-decoration: none; cursor: pointer; }
+  .otp-boxes { display: flex; gap: 10px; margin-top: 24px; }
+  .otp-cell {
+    flex: 1; height: 54px; min-width: 0;
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    text-align: center;
+    font-size: 22px; font-weight: 700; color: var(--ink-900);
+    outline: none; background: var(--white);
+    transition: border-color 0.18s, box-shadow 0.18s, transform 0.1s;
+  }
+  .otp-cell:focus { border-color: var(--purple-500); box-shadow: 0 0 0 4px var(--purple-50); }
+  .otp-cell.filled { border-color: var(--purple-400); background: var(--purple-50); }
+  .resend { margin-top: 18px; font-size: 13.5px; color: var(--ink-500); font-weight: 500; }
+  .resend-link { color: var(--purple-600); font-weight: 700; text-decoration: none; cursor: pointer; }
+  .otp-foot { margin-top: 16px; text-align: center; font-size: 12.5px; color: var(--ink-300); line-height: 1.5; }
+
+  /* ============ SCREEN: SPLASH ============ */
+  #splash {
+    background: radial-gradient(120% 80% at 50% 8%, var(--purple-50) 0%, var(--white) 55%);
+    align-items: center; justify-content: center;
+  }
+  .ambient {
+    position: absolute; top: 38%; left: 50%;
+    width: 360px; height: 360px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(124,58,237,0.10) 0%, rgba(124,58,237,0) 70%);
+    animation: breathe 3.4s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%,100% { transform: translate(-50%,-50%) scale(1); opacity: .7; }
+    50%     { transform: translate(-50%,-50%) scale(1.12); opacity: 1; }
+  }
+  .brand-block {
+    display: flex; flex-direction: column; align-items: center; gap: 24px; z-index: 2;
+    animation: rise 0.9s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  .brand-block .mark { width: 96px; height: 96px; border-radius: 28px; box-shadow: var(--shadow-soft); }
+  .wordmark { text-align: center; }
+  .wordmark h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink-900); }
+  .wordmark p  { margin-top: 8px; font-size: 14px; font-weight: 500; letter-spacing: 0.04em; color: var(--ink-500); }
+  .loader { position: absolute; bottom: 96px; display: flex; gap: 9px; z-index: 2; }
+  .loader span { width: 9px; height: 9px; border-radius: 50%; background: var(--purple-500); opacity: .35; animation: dot 1.1s ease-in-out infinite; }
+  .loader span:nth-child(2) { animation-delay: .18s; }
+  .loader span:nth-child(3) { animation-delay: .36s; }
+  @keyframes dot { 0%,100% { opacity:.3; transform: scale(.85);} 40% { opacity:1; transform: scale(1.15);} }
+  .footer { position: absolute; bottom: 44px; font-size: 12px; letter-spacing: .06em; color: var(--ink-500); font-weight: 500; z-index: 2; }
+  .footer b { color: var(--purple-600); font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="notch"></div>
+
+    <!-- ================= SPLASH ================= -->
+    <section class="screen" id="splash" onclick="go('login')">
+      <div class="ambient"></div>
+      <div class="brand-block">
+        <div class="mark">
+          <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 30 H15 L20 18 L28 40 L34 26 L38 30 H52" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="wordmark">
+          <h1>Medu<span>run</span></h1>
+          <p>DRIVER PARTNER</p>
+        </div>
+      </div>
+      <div class="loader"><span></span><span></span><span></span></div>
+      <div class="footer">Powered by <b>Medurun Health</b></div>
+    </section>
+
+    <!-- ================= LOGIN ================= -->
+    <section class="screen" id="login">
+      <div class="pad">
+        <div class="topmark">
+          <div class="mark">
+            <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 30 H15 L20 18 L28 40 L34 26 L38 30 H52" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="name">Medu<span>run</span></div>
+        </div>
+
+        <div class="heading">
+          <h2>Welcome to<br>Medurun Driver</h2>
+          <p>Sign in using your registered mobile number.</p>
+        </div>
+
+        <div style="margin-top:28px;">
+          <div class="label">Mobile number</div>
+          <div class="phone-input">
+            <div class="cc">
+              <span class="flag">🇮🇳</span><span>+91</span>
+              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <input class="field num" type="tel" inputmode="numeric" maxlength="10" placeholder="00000 00000" />
+          </div>
+          <div class="hint">We'll send a 6-digit OTP to verify this number.</div>
+
+          <button class="btn" style="margin-top:24px;" onclick="state.driverType='new'; showScreen('otp')">
+            Continue
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+
+          <div class="textlink" style="margin-top:20px;">New Driver? <a onclick="state.driverType='new'; showScreen('registration')">Register Here</a></div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="terms">
+          By continuing, you agree to Medurun's<br>
+          <a href="#">Terms of Service</a> &amp; <a href="#">Privacy Policy</a>.
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= OTP VERIFICATION ================= -->
+    <section class="screen" id="otp">
+      <div class="pad">
+        <div class="topbar">
+          <div class="back" onclick="showScreen('login')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </div>
+        </div>
+
+        <div class="heading">
+          <h2>Verify your number</h2>
+          <p>Enter the 6-digit code sent to<br>
+            <strong id="otpNumber" style="color:var(--ink-900);">+91 00000 00000</strong>
+            &nbsp;<a class="edit-num" onclick="showScreen('login')">Edit</a>
+          </p>
+        </div>
+
+        <div class="otp-boxes" id="otpBoxes">
+          <input class="otp-cell" type="tel" inputmode="numeric" maxlength="1" />
+          <input class="otp-cell" type="tel" inputmode="numeric" maxlength="1" />
+          <input class="otp-cell" type="tel" inputmode="numeric" maxlength="1" />
+          <input class="otp-cell" type="tel" inputmode="numeric" maxlength="1" />
+          <input class="otp-cell" type="tel" inputmode="numeric" maxlength="1" />
+          <input class="otp-cell" type="tel" inputmode="numeric" maxlength="1" />
+        </div>
+
+        <div class="resend" id="resendRow">
+          <span id="resendTimer">Resend code in 0:30</span>
+          <a id="resendBtn" class="resend-link" style="display:none;" onclick="startOtpTimer()">Resend code</a>
+        </div>
+
+        <div class="spacer"></div>
+
+        <button class="btn" onclick="verifyOtp()">
+          Verify &amp; Continue
+        </button>
+        <p class="otp-foot">Didn't get it? Check your SMS, or wait for the timer to resend.</p>
+      </div>
+    </section>
+
+    <!-- ============ STEP 1 — PERSONAL DETAILS ============ -->
+    <section class="screen" id="registration">
+      <div class="step-head">
+        <div class="topbar">
+          <div class="back" onclick="showScreen('login')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </div>
+        </div>
+        <div class="stepper">
+          <div class="track"><div class="fill" style="width:25%"></div></div>
+          <div class="count">Step 1 of 4</div>
+        </div>
+        <div class="heading"><h2>Personal details</h2><p>Tell us about yourself.</p></div>
+      </div>
+      <div class="scroll" style="padding-top:16px;">
+        <div class="field-group"><div class="mini-label">Full name</div><input class="field sm" id="r_name" placeholder="e.g. Rahul Sharma" /></div>
+        <div class="field-group"><div class="mini-label">Mobile number</div><input class="field sm" id="r_mobile" readonly style="background:var(--purple-50);color:var(--purple-700);font-weight:700;" /></div>
+        <div class="field-group"><div class="mini-label">Email address</div><input class="field sm" id="r_email" type="email" placeholder="name@email.com" /></div>
+        <div class="field-group"><div class="mini-label">City</div><input class="field sm" id="r_city" placeholder="e.g. Bengaluru" /></div>
+        <div class="field-group"><div class="mini-label">Date of birth</div><input class="field sm" id="r_dob" type="date" /></div>
+        <div class="field-group">
+          <div class="mini-label">Gender</div>
+          <div class="segmented" id="r_gender">
+            <button class="seg" onclick="pickSeg(this,'gender','Male')">Male</button>
+            <button class="seg" onclick="pickSeg(this,'gender','Female')">Female</button>
+            <button class="seg" onclick="pickSeg(this,'gender','Other')">Other</button>
+          </div>
+        </div>
+      </div>
+      <div class="actionbar"><button class="btn" onclick="saveStep1()">Continue</button></div>
+    </section>
+
+    <!-- ============ STEP 2 — DRIVER DOCUMENTS ============ -->
+    <section class="screen" id="reg-docs">
+      <div class="step-head">
+        <div class="topbar">
+          <div class="back" onclick="showScreen('registration')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </div>
+        </div>
+        <div class="stepper">
+          <div class="track"><div class="fill" style="width:50%"></div></div>
+          <div class="count">Step 2 of 4</div>
+        </div>
+        <div class="heading"><h2>Driver documents</h2><p>Upload your verification documents.</p></div>
+      </div>
+      <div class="scroll" style="padding-top:16px;" id="docList"><!-- JS rendered --></div>
+      <div class="actionbar"><button class="btn" onclick="showScreen('reg-vehicle')">Continue</button></div>
+    </section>
+
+    <!-- ============ STEP 3 — ADD AMBULANCE ============ -->
+    <section class="screen" id="reg-vehicle">
+      <div class="step-head">
+        <div class="topbar">
+          <div class="back" onclick="showScreen('reg-docs')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </div>
+        </div>
+        <div class="stepper">
+          <div class="track"><div class="fill" style="width:75%"></div></div>
+          <div class="count">Step 3 of 4</div>
+        </div>
+        <div class="heading"><h2>Add ambulance</h2><p>Register up to 2 ambulances.</p></div>
+      </div>
+      <div class="scroll" style="padding-top:16px;">
+        <div class="counter-pill" id="vehCounter">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17h6M5 17H3v-6l2-5h11l4 5v6h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+          <span id="vehCounterText">0 of 2 vehicles added</span>
+        </div>
+        <div id="vehList"><!-- JS rendered --></div>
+        <button class="add-veh" id="addVehBtn" onclick="addVehicle()">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add ambulance
+        </button>
+        <div class="limit-note" id="limitNote">Individual Drivers can register a maximum of 2 ambulances. To manage more vehicles, please register as an Agency.</div>
+      </div>
+      <div class="actionbar"><button class="btn" onclick="goReview()">Continue</button></div>
+    </section>
+
+    <!-- ============ STEP 4 — REVIEW & SUBMIT ============ -->
+    <section class="screen" id="reg-review">
+      <div class="step-head">
+        <div class="topbar">
+          <div class="back" onclick="showScreen('reg-vehicle')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </div>
+        </div>
+        <div class="stepper">
+          <div class="track"><div class="fill" style="width:100%"></div></div>
+          <div class="count">Step 4 of 4</div>
+        </div>
+        <div class="heading"><h2>Review &amp; submit</h2><p>Confirm your details before submitting.</p></div>
+      </div>
+      <div class="scroll" style="padding-top:16px;" id="reviewBody"><!-- JS rendered --></div>
+      <div class="actionbar"><button class="btn" onclick="showScreen('reg-success')">Submit for Verification</button></div>
+    </section>
+
+    <!-- ============ SUCCESS ============ -->
+    <section class="screen" id="reg-success">
+      <div class="success-ico">
+        <span class="ring"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2>Registration submitted<br>successfully</h2>
+      <p>Your profile, documents and ambulance details have been submitted for verification. Once approved by the Medurun Super Admin, you'll be able to go online and start accepting rides.</p>
+      <button class="btn" style="margin-top:28px;max-width:300px;" onclick="showScreen('login')">Back to Login</button>
+    </section>
+
+    <!-- ============ REGISTRATION STATE: PENDING VERIFICATION ============ -->
+    <section class="screen status-scr" id="pending">
+      <div class="status-ico amber">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+      </div>
+      <h2>Verification in progress</h2>
+      <p>Your profile, documents and ambulance details are being reviewed by the Medurun Super Admin. This usually takes 24–48 hours.</p>
+      <div class="status-steps">
+        <div class="st done"><span class="b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Details submitted</div>
+        <div class="st active"><span class="b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg></span> Under review by Super Admin</div>
+        <div class="st wait"><span class="b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg></span> Approval &amp; go online</div>
+      </div>
+      <div class="actionbar2"><button class="btn outline" onclick="showScreen('login')">Back to Login</button></div>
+    </section>
+
+    <!-- ============ REGISTRATION STATE: CORRECTION REQUIRED ============ -->
+    <section class="screen" id="correction">
+      <div class="app-top" style="padding-top:46px;">
+        <div><div class="ttl">Action required</div><div class="sub">Some documents need your attention</div></div>
+      </div>
+      <div class="app-body" style="padding-bottom:24px;">
+        <div class="card" style="background:#FFF1EC;border-color:#FAD7CB;">
+          <div style="display:flex;gap:11px;align-items:flex-start;">
+            <div class="status-ico amber" style="width:38px;height:38px;margin:0;flex-shrink:0;background:linear-gradient(150deg,#EF7A4D,#D9540A);box-shadow:none;">
+              <svg viewBox="0 0 24 24" style="width:20px;height:20px;" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+            </div>
+            <div><div style="font-size:14px;font-weight:700;color:#9A3412;">2 documents need re-upload</div>
+            <div style="font-size:12.5px;color:#B45309;margin-top:3px;line-height:1.5;">The Super Admin reviewed your submission. Please re-upload the items below to continue verification.</div></div>
+          </div>
+        </div>
+
+        <div class="sec-title">Re-upload requested</div>
+        <div class="card">
+          <div class="list-row">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div class="lr-main"><div class="lr-t">Driving License</div><div class="lr-s">Image blurry — re-upload a clear copy</div></div>
+            <span class="badge b-reupload">Re-upload</span>
+          </div>
+          <div class="list-row">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div class="lr-main"><div class="lr-t">Insurance · Ambulance 1</div><div class="lr-s">Expired document — upload renewed copy</div></div>
+            <span class="badge b-expired">Expired</span>
+          </div>
+        </div>
+      </div>
+      <div class="actionbar"><button class="btn" onclick="showScreen('documents')">Re-upload Documents</button></div>
+    </section>
+
+    <!-- ============ REGISTRATION STATE: APPROVED ============ -->
+    <section class="screen status-scr" id="approved">
+      <div class="status-ico green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2>You're verified &amp; approved</h2>
+      <p>Your profile and ambulances have been approved by the Medurun Super Admin. Select your active ambulance and go online to start accepting rides.</p>
+      <div class="actionbar2"><button class="btn" onclick="showScreen('ambulance-select')">Continue</button></div>
+    </section>
+
+    <!-- ============ AMBULANCE SELECTION (agency + individual) ============ -->
+    <section class="screen" id="ambulance-select">
+      <div class="app-top" style="padding-top:46px;">
+        <div><div class="ttl">Select today's ambulance</div><div class="sub">Choose the vehicle you'll drive today</div></div>
+      </div>
+      <div class="app-body" style="padding-bottom:24px;" id="ambList"><!-- JS rendered --></div>
+      <div class="actionbar"><button class="btn" onclick="showScreen('dashboard')">Confirm &amp; Continue</button></div>
+    </section>
+
+    <!-- ============ DASHBOARD (OFFLINE) ============ -->
+    <section class="screen" id="dashboard">
+      <div class="app-top">
+        <div class="avatar">RS</div>
+        <div><div class="ttl">Hi, Rahul</div><div class="sub" id="dashAmb">KA01AB1234 · ALS</div></div>
+        <div class="right"><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div></div>
+      </div>
+      <div class="app-body">
+        <div class="go-card off" id="goCard">
+          <div class="gc-top">
+            <div><div class="gc-state" id="goState">You're Offline</div><div class="gc-sub" id="goSub">Go online to receive ride requests</div></div>
+            <div class="switch" id="goSwitch" onclick="toggleOnline()"></div>
+          </div>
+          <button class="go-btn" id="goBtn" onclick="toggleOnline()">Go Online</button>
+        </div>
+
+        <div class="sec-title">Today's summary</div>
+        <div class="stat-grid">
+          <div class="stat"><div class="sv">₹0</div><div class="sl">Earnings</div></div>
+          <div class="stat"><div class="sv">0</div><div class="sl">Trips</div></div>
+          <div class="stat"><div class="sv">0h</div><div class="sl">Online</div></div>
+        </div>
+
+        <div class="sec-title">Alerts <a onclick="showScreen('documents')">View all</a></div>
+        <div class="card">
+          <div class="list-row">
+            <div class="ico" style="background:#FEF6E7;color:#B45309;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></div>
+            <div class="lr-main"><div class="lr-t">Pollution certificate expiring</div><div class="lr-s">Ambulance 1 · expires in 12 days</div></div>
+            <span class="badge b-expiring">Expiring</span>
+          </div>
+        </div>
+      </div>
+      <div class="tabbar">
+        <div class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Home</div>
+        <div class="tab" onclick="showScreen('earnings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><circle cx="12" cy="12" r="3"/></svg>Earnings</div>
+        <div class="tab" onclick="showScreen('vehicles')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17h6M5 17H3v-6l2-5h11l4 5v6h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>Vehicles</div>
+        <div class="tab" onclick="showScreen('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profile</div>
+      </div>
+    </section>
+
+    <!-- ============ WAITING FOR RIDE (ONLINE) ============ -->
+    <section class="screen" id="waiting">
+      <div class="app-top">
+        <div class="avatar">RS</div>
+        <div><div class="ttl">Hi, Rahul</div><div class="sub">KA01AB1234 · ALS</div></div>
+        <div class="right"><span class="badge b-online"><span class="dotmark"></span>Online</span></div>
+      </div>
+      <div class="app-body">
+        <div class="go-card" id="goCard2">
+          <div class="gc-top">
+            <div><div class="gc-state">You're Online</div><div class="gc-sub">Searching for nearby ride requests…</div></div>
+            <div class="switch on" onclick="showScreen('dashboard')"></div>
+          </div>
+          <button class="go-btn on" onclick="showScreen('ride-request')">Simulate Incoming Request</button>
+        </div>
+
+        <div class="card flat" style="text-align:center;padding:30px 18px;">
+          <div style="width:84px;height:84px;border-radius:50%;margin:0 auto 16px;background:var(--purple-50);display:flex;align-items:center;justify-content:center;position:relative;">
+            <span style="position:absolute;width:84px;height:84px;border-radius:50%;border:2px solid var(--purple-100);animation:ringout 1.8s ease-out infinite;"></span>
+            <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="var(--purple-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          <div style="font-size:15px;font-weight:700;color:var(--ink-900);">Waiting for ride requests</div>
+          <div style="font-size:12.5px;color:var(--ink-500);margin-top:5px;line-height:1.5;">Stay online and nearby. You'll be notified the moment a request arrives.</div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat"><div class="sv">₹0</div><div class="sl">Today</div></div>
+          <div class="stat"><div class="sv">0</div><div class="sl">Trips</div></div>
+          <div class="stat"><div class="sv">12m</div><div class="sl">Online</div></div>
+        </div>
+      </div>
+      <div class="tabbar">
+        <div class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Home</div>
+        <div class="tab" onclick="showScreen('earnings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><circle cx="12" cy="12" r="3"/></svg>Earnings</div>
+        <div class="tab" onclick="showScreen('vehicles')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17h6M5 17H3v-6l2-5h11l4 5v6h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>Vehicles</div>
+        <div class="tab" onclick="showScreen('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profile</div>
+      </div>
+    </section>
+
+    <!-- ============ INCOMING RIDE REQUEST ============ -->
+    <section class="screen" id="ride-request">
+      <div class="map">
+        <div class="map-pin start" style="left:30%;top:45%;"><div class="pin-dot"></div></div>
+      </div>
+      <div class="incoming-banner" style="position:absolute;top:0;left:0;right:0;z-index:8;padding-top:46px;">
+        <span class="cd" id="rideCd">15</span> New ride request — respond now
+      </div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="sheet-h">
+          <div class="avatar">AP</div>
+          <div><div class="sh-t">Apollo Hospital</div><div class="sh-s">Emergency pickup · 2.4 km away</div></div>
+          <div class="sh-right"><span class="type-tag">ALS</span><div class="sh-fare" style="margin-top:6px;">₹680</div></div>
+        </div>
+        <div class="trip-line">
+          <div class="rail"><span class="d s"></span><span class="bar"></span><span class="d e"></span></div>
+          <div>
+            <div class="tl-main"><div class="tl-k">Pickup</div><div class="tl-v">14, MG Road, Indiranagar</div></div>
+            <div class="tl-main" style="padding-bottom:0;"><div class="tl-k">Drop</div><div class="tl-v">Apollo Hospital, Bannerghatta Rd</div></div>
+          </div>
+        </div>
+        <div class="row-btns">
+          <button class="btn outline sm" onclick="showScreen('waiting')">Decline</button>
+          <button class="btn sm" onclick="showScreen('ride-accepted')">Accept Ride</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RIDE ACCEPTED ============ -->
+    <section class="screen" id="ride-accepted">
+      <div class="map">
+        <div class="map-pin start" style="left:30%;top:42%;"><div class="pin-dot"></div></div>
+        <div class="map-car" style="left:60%;top:62%;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17h6M5 17H3v-6l2-5h11l4 5v6h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg></div>
+      </div>
+      <div class="ride-top"><div class="ride-pill"><span class="status-ico green" style="width:22px;height:22px;margin:0;box-shadow:none;"><svg viewBox="0 0 24 24" style="width:13px;height:13px;" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Ride accepted</div></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="sheet-h">
+          <div class="avatar">AP</div>
+          <div><div class="sh-t">Apollo Hospital</div><div class="sh-s">Patient: Mr. Verma · +91 98••• ••210</div></div>
+          <div class="sh-right"><div class="icon-btn" style="border-color:var(--purple-100);color:var(--purple-600);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.5-1.1a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2z"/></svg></div></div>
+        </div>
+        <div class="trip-line">
+          <div class="rail"><span class="d s"></span><span class="bar"></span><span class="d e"></span></div>
+          <div>
+            <div class="tl-main"><div class="tl-k">Pickup · 2.4 km · 6 min</div><div class="tl-v">14, MG Road, Indiranagar</div></div>
+            <div class="tl-main" style="padding-bottom:0;"><div class="tl-k">Drop</div><div class="tl-v">Apollo Hospital, Bannerghatta Rd</div></div>
+          </div>
+        </div>
+        <button class="btn" style="margin-top:16px;" onclick="showScreen('navigate-pickup')">Navigate to Pickup</button>
+      </div>
+    </section>
+
+    <!-- ============ NAVIGATE TO PICKUP ============ -->
+    <section class="screen" id="navigate-pickup">
+      <div class="map">
+        <div class="map-pin start" style="left:32%;top:38%;"><div class="pin-dot"></div></div>
+        <div class="map-car" style="left:52%;top:58%;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17h6M5 17H3v-6l2-5h11l4 5v6h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg></div>
+      </div>
+      <div class="ride-top">
+        <div class="ride-pill"><span class="k">ETA</span> 6 min</div>
+        <div class="ride-pill"><span class="k">Dist</span> 2.4 km</div>
+      </div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="sheet-h">
+          <div class="status-ico purple" style="width:46px;height:46px;margin:0;box-shadow:none;"><svg viewBox="0 0 24 24" style="width:22px;height:22px;" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <div><div class="sh-t">Heading to pickup</div><div class="sh-s">14, MG Road, Indiranagar</div></div>
+        </div>
+        <button class="btn" style="margin-top:4px;" onclick="showScreen('arrived-pickup')">Arrived at Pickup</button>
+      </div>
+    </section>
+
+    <!-- ============ ARRIVED AT PICKUP ============ -->
+    <section class="screen" id="arrived-pickup">
+      <div class="map">
+        <div class="map-pin start" style="left:50%;top:48%;"><div class="pin-dot"></div></div>
+      </div>
+      <div class="ride-top"><div class="ride-pill"><span class="status-ico green" style="width:22px;height:22px;margin:0;box-shadow:none;"><svg viewBox="0 0 24 24" style="width:13px;height:13px;" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Arrived at pickup</div></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="sheet-h">
+          <div class="avatar">MV</div>
+          <div><div class="sh-t">Mr. Verma</div><div class="sh-s">Confirm patient before starting trip</div></div>
+          <div class="sh-right"><div class="icon-btn" style="border-color:var(--purple-100);color:var(--purple-600);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.5-1.1a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2z"/></svg></div></div>
+        </div>
+        <div class="row-btns">
+          <button class="btn outline sm" onclick="showScreen('navigate-pickup')">Back</button>
+          <button class="btn sm" onclick="showScreen('patient-onboard')">Confirm Patient Onboard</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PATIENT ONBOARD ============ -->
+    <section class="screen" id="patient-onboard">
+      <div class="map">
+        <div class="map-pin start" style="left:30%;top:42%;"><div class="pin-dot"></div></div>
+        <div class="map-pin end" style="left:68%;top:30%;"><div class="pin-dot"></div></div>
+        <div class="map-car" style="left:34%;top:46%;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17h6M5 17H3v-6l2-5h11l4 5v6h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg></div>
+      </div>
+      <div class="ride-top"><div class="ride-pill"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--purple-600)" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Patient onboard</div></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="sheet-h">
+          <div class="avatar" style="background:linear-gradient(150deg,#34C759,#1F9D4D);">MV</div>
+          <div><div class="sh-t">Mr. Verma onboard</div><div class="sh-s">Ready to start trip to hospital</div></div>
+        </div>
+        <div class="trip-line">
+          <div class="rail"><span class="d e"></span></div>
+          <div><div class="tl-main" style="padding-bottom:0;"><div class="tl-k">Destination</div><div class="tl-v">Apollo Hospital, Bannerghatta Rd · 8.1 km</div></div></div>
+        </div>
+        <button class="btn" style="margin-top:14px;" onclick="showScreen('navigate-destination')">Start Trip to Destination</button>
+      </div>
+    </section>
+
+    <!-- ============ NAVIGATE TO DESTINATION ============ -->
+    <section class="screen" id="navigate-destination">
+      <div class="map">
+        <div class="map-pin end" style="left:64%;top:30%;"><div class="pin-dot"></div></div>
+        <div class="map-car" style="left:40%;top:58%;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17h6M5 17H3v-6l2-5h11l4 5v6h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg></div>
+      </div>
+      <div class="ride-top">
+        <div class="ride-pill"><span class="k">ETA</span> 14 min</div>
+        <div class="ride-pill"><span class="k">Dist</span> 8.1 km</div>
+        <div class="ride-pill" style="background:#FDEDEC;color:#C0392B;"><span class="dotmark" style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>Emergency</div>
+      </div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="sheet-h">
+          <div class="status-ico green" style="width:46px;height:46px;margin:0;box-shadow:none;"><svg viewBox="0 0 24 24" style="width:22px;height:22px;" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <div><div class="sh-t">En route to hospital</div><div class="sh-s">Apollo Hospital, Bannerghatta Rd</div></div>
+        </div>
+        <button class="btn" style="margin-top:4px;" onclick="showScreen('trip-completed')">Complete Trip</button>
+      </div>
+    </section>
+
+    <!-- ============ TRIP COMPLETED ============ -->
+    <section class="screen" id="trip-completed">
+      <div class="app-top status-scr" style="display:flex;padding-top:50px;flex:0;">
+        <div style="margin:0 auto;text-align:center;">
+          <div class="status-ico green" style="margin:0 auto 16px;"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <h2 style="font-size:20px;font-weight:700;color:var(--ink-900);">Trip completed</h2>
+          <p style="font-size:13px;color:var(--ink-500);margin-top:6px;">Apollo Hospital · 8.1 km · 16 min</p>
+        </div>
+      </div>
+      <div class="app-body" style="padding-top:18px;">
+        <div class="card flat">
+          <div class="sec-title" style="margin-top:0;">Fare breakdown</div>
+          <div class="sum-row"><span class="k">Base fare</span><span class="v">₹250</span></div>
+          <div class="sum-row"><span class="k">Distance (8.1 km)</span><span class="v">₹324</span></div>
+          <div class="sum-row"><span class="k">ALS equipment</span><span class="v">₹100</span></div>
+          <div class="sum-row"><span class="k">Waiting</span><span class="v">₹26</span></div>
+          <div class="sum-row" style="border-top:1px solid var(--line);margin-top:6px;padding-top:12px;"><span class="k" style="font-weight:700;color:var(--ink-900);font-size:15px;">Total earned</span><span class="v" style="font-size:18px;font-weight:800;">₹700</span></div>
+        </div>
+        <div class="card" style="display:flex;align-items:center;gap:11px;">
+          <div class="ico list-row" style="width:40px;height:40px;border-radius:11px;background:var(--purple-50);color:var(--purple-600);display:flex;align-items:center;justify-content:center;border:none;padding:0;">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <div style="flex:1;"><div style="font-size:13.5px;font-weight:650;color:var(--ink-900);">Added to today's earnings</div><div style="font-size:12px;color:var(--ink-500);">Paid via Medurun · Cash collected</div></div>
+        </div>
+      </div>
+      <div class="actionbar"><button class="btn" onclick="showScreen('waiting')">Back to Online</button></div>
+    </section>
+
+    <!-- ============ EARNINGS ============ -->
+    <section class="screen" id="earnings">
+      <div class="app-top"><div><div class="ttl">Earnings</div><div class="sub">Your trips &amp; payouts</div></div></div>
+      <div class="app-body">
+        <div class="go-card" style="background:linear-gradient(150deg,var(--purple-500),var(--purple-700));">
+          <div class="gc-sub" style="opacity:.85;">This week</div>
+          <div style="font-size:32px;font-weight:800;letter-spacing:-0.02em;margin-top:2px;">₹8,420</div>
+          <div style="display:flex;gap:20px;margin-top:14px;">
+            <div><div style="font-size:12px;opacity:.8;">Trips</div><div style="font-size:16px;font-weight:700;">14</div></div>
+            <div><div style="font-size:12px;opacity:.8;">Online</div><div style="font-size:16px;font-weight:700;">36h</div></div>
+            <div><div style="font-size:12px;opacity:.8;">Avg / trip</div><div style="font-size:16px;font-weight:700;">₹601</div></div>
+          </div>
+        </div>
+        <div class="sec-title">Recent trips</div>
+        <div class="card">
+          <div class="list-row"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="lr-main"><div class="lr-t">Apollo Hospital</div><div class="lr-s">Today · 16 min · 8.1 km</div></div><div style="font-weight:800;color:var(--ink-900);font-size:14px;">₹700</div></div>
+          <div class="list-row"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="lr-main"><div class="lr-t">Fortis Hospital</div><div class="lr-s">Today · 22 min · 11.4 km</div></div><div style="font-weight:800;color:var(--ink-900);font-size:14px;">₹920</div></div>
+          <div class="list-row"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="lr-main"><div class="lr-t">Manipal Hospital</div><div class="lr-s">Yesterday · 18 min · 9.2 km</div></div><div style="font-weight:800;color:var(--ink-900);font-size:14px;">₹780</div></div>
+        </div>
+      </div>
+      <div class="tabbar">
+        <div class="tab" onclick="showScreen('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Home</div>
+        <div class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><circle cx="12" cy="12" r="3"/></svg>Earnings</div>
+        <div class="tab" onclick="showScreen('vehicles')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17h6M5 17H3v-6l2-5h11l4 5v6h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>Vehicles</div>
+        <div class="tab" onclick="showScreen('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profile</div>
+      </div>
+    </section>
+
+    <!-- ============ MY VEHICLES ============ -->
+    <section class="screen" id="vehicles">
+      <div class="app-top"><div><div class="ttl">My Vehicles</div><div class="sub">2 of 2 ambulances</div></div></div>
+      <div class="app-body" id="vehAppList"><!-- JS rendered --></div>
+      <div class="tabbar">
+        <div class="tab" onclick="showScreen('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Home</div>
+        <div class="tab" onclick="showScreen('earnings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><circle cx="12" cy="12" r="3"/></svg>Earnings</div>
+        <div class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17h6M5 17H3v-6l2-5h11l4 5v6h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>Vehicles</div>
+        <div class="tab" onclick="showScreen('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profile</div>
+      </div>
+    </section>
+
+    <!-- ============ DOCUMENTS ============ -->
+    <section class="screen" id="documents">
+      <div class="app-top">
+        <div class="back" onclick="showScreen('profile')" style="margin-right:2px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></div>
+        <div><div class="ttl">Documents</div><div class="sub">Synced with Medurun verification</div></div>
+      </div>
+      <div class="app-body" id="docAppList"><!-- JS rendered --></div>
+    </section>
+
+    <!-- ============ PROFILE ============ -->
+    <section class="screen" id="profile">
+      <div class="app-top"><div><div class="ttl">Profile</div></div></div>
+      <div class="app-body">
+        <div class="card flat">
+          <div class="prof-head">
+            <div class="avatar">RS</div>
+            <div><div class="ph-name">Rahul Sharma</div><div class="ph-meta">+91 98765 43210 · Bengaluru</div></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:4px;">
+            <span class="badge b-verified"><span class="dotmark"></span>Verified</span>
+            <span class="type-tag">Individual Driver</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="list-row" onclick="showScreen('documents')" style="cursor:pointer;">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div class="lr-main"><div class="lr-t">Documents</div><div class="lr-s">1 expiring soon</div></div>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="list-row" onclick="showScreen('vehicles')" style="cursor:pointer;">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17h6M5 17H3v-6l2-5h11l4 5v6h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg></div>
+            <div class="lr-main"><div class="lr-t">My Vehicles</div><div class="lr-s">2 ambulances</div></div>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="list-row" onclick="showScreen('ambulance-select')" style="cursor:pointer;">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+            <div class="lr-main"><div class="lr-t">Active Ambulance</div><div class="lr-s">Switch today's vehicle</div></div>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="list-row" onclick="showScreen('support')" style="cursor:pointer;">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+            <div class="lr-main"><div class="lr-t">Help &amp; Support</div><div class="lr-s">FAQs, contact Medurun</div></div>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+        <button class="btn outline" onclick="showScreen('login')">Log Out</button>
+      </div>
+      <div class="tabbar">
+        <div class="tab" onclick="showScreen('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Home</div>
+        <div class="tab" onclick="showScreen('earnings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><circle cx="12" cy="12" r="3"/></svg>Earnings</div>
+        <div class="tab" onclick="showScreen('vehicles')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17h6M5 17H3v-6l2-5h11l4 5v6h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>Vehicles</div>
+        <div class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profile</div>
+      </div>
+    </section>
+
+    <!-- ============ SUPPORT ============ -->
+    <section class="screen" id="support">
+      <div class="app-top">
+        <div class="back" onclick="showScreen('profile')" style="margin-right:2px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></div>
+        <div><div class="ttl">Help &amp; Support</div><div class="sub">We're here 24/7</div></div>
+      </div>
+      <div class="app-body">
+        <div class="card" style="background:linear-gradient(150deg,var(--purple-500),var(--purple-700));border:none;color:#fff;">
+          <div style="font-size:15px;font-weight:700;">Emergency support line</div>
+          <div style="font-size:12.5px;opacity:.85;margin-top:3px;">For active-trip emergencies, call immediately.</div>
+          <button class="go-btn on" style="margin-top:14px;">Call 1800-MEDURUN</button>
+        </div>
+        <div class="sec-title">Quick help</div>
+        <div class="card">
+          <div class="list-row"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="lr-main"><div class="lr-t">Chat with support</div><div class="lr-s">Avg reply under 2 min</div></div><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+          <div class="list-row"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="lr-main"><div class="lr-t">FAQs</div><div class="lr-s">Payments, documents, rides</div></div><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+          <div class="list-row"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H5.2L4 17.5z"/></svg></div><div class="lr-main"><div class="lr-t">Report an issue</div><div class="lr-s">Trip, fare or vehicle problem</div></div><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ============ DEMO CONTROL PANEL (prototype navigation only) ============ -->
+  <aside id="demo">
+    <button id="demoToggle" onclick="document.getElementById('demo').classList.toggle('collapsed')" title="Toggle demo panel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="demo-head">
+      <div class="t">Demo Control Panel</div>
+      <div class="s">Prototype navigation</div>
+    </div>
+    <div class="demo-body" id="demoBody"><!-- JS rendered --></div>
+  </aside>
+
+<script>
+  /* ============ SCREEN ROUTER ============ */
+  let currentScreen = 'splash';
+
+  function showScreen(id) {
+    const next = document.getElementById(id);
+    if (!next) { console.warn('No screen:', id); return; }
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    next.classList.add('active');
+    currentScreen = id;
+  }
+  // alias
+  const go = showScreen;
+
+  /* ============ PROTOTYPE STATE ============ */
+  const state = {
+    mobile: '',
+    personal: { name:'', mobile:'', email:'', city:'', dob:'', gender:'' },
+    docs: {},          // keyed by doc id -> {uploaded, number, issue, expiry}
+    vehicles: [],      // [{number, type, docs:{}}]
+    primary: 0,
+    driverType: 'new', // new | agency | approved | pending | correction
+    vehCount: 2        // ambulances on file (affects approved/agency selection skip)
+  };
+
+  /* doc definitions — expiry flag synced to Super Admin Document Expiry module */
+  const DRIVER_DOCS = [
+    { id:'dl',      name:'Driving License',              expiry:true },
+    { id:'aadhaar', name:'Aadhaar Card',                 expiry:false },
+    { id:'pan',     name:'PAN Card',                     expiry:false },
+    { id:'police',  name:'Police Verification Certificate', expiry:true },
+    { id:'medical', name:'Medical Certificate',          expiry:true, optional:true },
+  ];
+  const VEHICLE_DOCS = [
+    { id:'rc',        name:'RC',                    expiry:true },
+    { id:'insurance', name:'Insurance',             expiry:true },
+    { id:'fitness',   name:'Fitness Certificate',   expiry:true },
+    { id:'roadtax',   name:'Road Tax',              expiry:true },
+    { id:'pollution', name:'Pollution Certificate', expiry:true, optional:true },
+  ];
+
+  const docIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+  const upIcon  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`;
+  const okIcon  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+  /* build a doc card; storeKey is the object holding this doc's state */
+  function docCard(def, store, prefix) {
+    const k = def.id;
+    store[k] = store[k] || { uploaded:false, number:'', issue:'', expiry:'' };
+    const expiryField = def.expiry
+      ? `<div style="flex:1;min-width:0;"><div class="mini-label">Expiry date</div><input class="field sm" type="date" onchange="setDoc('${prefix}','${k}','expiry',this.value)"></div>` : '';
+    return `
+      <div class="doc-card">
+        <div class="doc-top">
+          <div class="doc-ico">${docIcon}</div>
+          <div><div class="doc-name">${def.name}</div><div class="doc-sub">${def.expiry?'Issue & expiry required':'No expiry'}</div></div>
+          ${def.optional?'<span class="badge-opt">OPTIONAL</span>':''}
+        </div>
+        <button class="upload-btn" id="up_${prefix}_${k}" onclick="mockUpload('${prefix}','${k}',this)">${upIcon} Upload document</button>
+        <div class="doc-fields" id="df_${prefix}_${k}">
+          <div class="field-group"><div class="mini-label">Document number</div><input class="field sm" placeholder="Enter number" onchange="setDoc('${prefix}','${k}','number',this.value)"></div>
+          <div class="row2">
+            <div style="flex:1;min-width:0;"><div class="mini-label">Issue date</div><input class="field sm" type="date" onchange="setDoc('${prefix}','${k}','issue',this.value)"></div>
+            ${expiryField}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  /* doc state setters — prefix 'drv' = driver docs, 'v0'/'v1' = vehicle index */
+  function docStore(prefix) {
+    if (prefix === 'drv') return state.docs;
+    const idx = +prefix.slice(1);
+    return state.vehicles[idx].docs;
+  }
+  function setDoc(prefix, k, field, val) { docStore(prefix)[k][field] = val; }
+  function mockUpload(prefix, k, btn) {
+    const store = docStore(prefix); store[k].uploaded = true;
+    btn.classList.add('done');
+    btn.innerHTML = okIcon + ' Uploaded · sample.pdf';
+    document.getElementById('df_'+prefix+'_'+k).classList.add('show');
+  }
+
+  /* ---- render driver docs (step 2) ---- */
+  function renderDriverDocs() {
+    document.getElementById('docList').innerHTML = DRIVER_DOCS.map(d => docCard(d, state.docs, 'drv')).join('');
+  }
+
+  /* ---- vehicles (step 3) ---- */
+  const VEH_TYPES = ['BLS','ALS','ICU','Neonatal'];
+  function addVehicle() {
+    if (state.vehicles.length >= 2) { document.getElementById('limitNote').classList.add('show'); return; }
+    state.vehicles.push({ number:'', type:'', docs:{} });
+    renderVehicles();
+  }
+  function removeVehicle(i) { state.vehicles.splice(i,1); renderVehicles(); }
+  function setVeh(i, field, val) { state.vehicles[i][field] = val; }
+  function pickType(i, t, el) {
+    el.parentNode.querySelectorAll('.seg').forEach(s=>s.classList.remove('on'));
+    el.classList.add('on'); setVeh(i,'type',t);
+  }
+  function renderVehicles() {
+    const list = document.getElementById('vehList');
+    list.innerHTML = state.vehicles.map((v,i) => `
+      <div class="veh-card">
+        <div class="veh-head">
+          <div class="veh-title"><span class="dot">${i+1}</span> Ambulance ${i+1}</div>
+          ${state.vehicles.length>1?`<span class="veh-remove" onclick="removeVehicle(${i})">Remove</span>`:''}
+        </div>
+        <div class="field-group"><div class="mini-label">Vehicle number</div><input class="field sm" value="${v.number}" placeholder="e.g. KA01AB1234" oninput="setVeh(${i},'number',this.value)"></div>
+        <div class="field-group">
+          <div class="mini-label">Ambulance type</div>
+          <div class="segmented">${VEH_TYPES.map(t=>`<button class="seg ${v.type===t?'on':''}" onclick="pickType(${i},'${t}',this)">${t}</button>`).join('')}</div>
+        </div>
+        <div class="veh-docs-label">Vehicle documents</div>
+        ${VEHICLE_DOCS.map(d => docCard(d, v.docs, 'v'+i)).join('')}
+      </div>`).join('');
+    // restore upload "done" visuals
+    state.vehicles.forEach((v,i)=>VEHICLE_DOCS.forEach(d=>{ if(v.docs[d.id]?.uploaded){ const b=document.getElementById('up_v'+i+'_'+d.id); if(b){b.classList.add('done');b.innerHTML=okIcon+' Uploaded · sample.pdf';document.getElementById('df_v'+i+'_'+d.id).classList.add('show');}}}));
+    // counter + button state
+    const n = state.vehicles.length;
+    document.getElementById('vehCounterText').textContent = `${n} of 2 vehicles added`;
+    const addBtn = document.getElementById('addVehBtn');
+    addBtn.disabled = n >= 2;
+    if (n < 2) document.getElementById('limitNote').classList.remove('show');
+  }
+
+  /* ---- save step 1 ---- */
+  function pickSeg(el, field, val) {
+    el.parentNode.querySelectorAll('.seg').forEach(s=>s.classList.remove('on'));
+    el.classList.add('on'); state.personal[field] = val;
+  }
+  function saveStep1() {
+    state.personal.name  = document.getElementById('r_name').value;
+    state.personal.email = document.getElementById('r_email').value;
+    state.personal.city  = document.getElementById('r_city').value;
+    state.personal.dob   = document.getElementById('r_dob').value;
+    showScreen('reg-docs');
+  }
+
+  /* ---- review (step 4) ---- */
+  function setPrimary(i) { state.primary = i; renderReview(); }
+  function goReview() { renderReview(); showScreen('reg-review'); }
+  function renderReview() {
+    const p = state.personal;
+    const row = (k,v)=>`<div class="sum-row"><span class="k">${k}</span><span class="v">${v||'—'}</span></div>`;
+    const docCount = DRIVER_DOCS.filter(d=>state.docs[d.id]?.uploaded).length;
+    let html = `
+      <div class="sum-card">
+        <div class="sum-top"><div class="sum-check">${okIcon}</div><div class="sum-title">Personal Details</div><span class="sum-edit" onclick="showScreen('registration')">Edit</span></div>
+        ${row('Name', p.name)}${row('Mobile', state.mobile)}${row('Email', p.email)}${row('City', p.city)}${row('Date of birth', p.dob)}${row('Gender', p.gender)}
+      </div>
+      <div class="sum-card">
+        <div class="sum-top"><div class="sum-check">${okIcon}</div><div class="sum-title">Driver Documents</div><span class="sum-edit" onclick="showScreen('reg-docs')">Edit</span></div>
+        ${DRIVER_DOCS.map(d=>row(d.name, state.docs[d.id]?.uploaded?'Uploaded':(d.optional?'Skipped':'Pending'))).join('')}
+      </div>
+      <div class="sum-card">
+        <div class="sum-top"><div class="sum-check">${okIcon}</div><div class="sum-title">Ambulance(s) · ${state.vehicles.length}</div><span class="sum-edit" onclick="showScreen('reg-vehicle')">Edit</span></div>
+        ${state.vehicles.map((v,i)=>row('Ambulance '+(i+1), (v.number||'—')+(v.type?(' · '+v.type):''))).join('') || row('Ambulances','None added')}
+      </div>`;
+    if (state.vehicles.length === 2) {
+      html += `<div class="sum-card"><div class="sum-title" style="margin-bottom:4px;">Primary ambulance</div>
+        <div class="doc-sub" style="margin-bottom:10px;">Choose which vehicle is active after approval.</div>
+        <div class="primary-pick">${state.vehicles.map((v,i)=>`
+          <div class="opt ${state.primary===i?'on':''}" onclick="setPrimary(${i})">
+            <div class="radio"></div>
+            <div><div class="pt">${v.number||('Ambulance '+(i+1))}</div><div class="ps">${v.type||'Type not set'}</div></div>
+          </div>`).join('')}</div></div>`;
+    }
+    document.getElementById('reviewBody').innerHTML = html;
+  }
+
+  /* ---- carry mobile number Login -> OTP/registration, run per-screen setup ---- */
+  const origShow = showScreen;
+  showScreen = function(id) {
+    if (id === 'otp' || id === 'registration') {
+      const raw = (document.querySelector('#login .num').value || '').trim();
+      state.mobile = raw ? '+91 ' + raw.replace(/(\d{5})(\d{1,5})/, '$1 $2') : '+91 00000 00000';
+    }
+    if (id === 'otp') document.getElementById('otpNumber').textContent = state.mobile;
+    if (id === 'registration') document.getElementById('r_mobile').value = state.mobile;
+    if (id === 'reg-docs')    renderDriverDocs();
+    if (id === 'reg-vehicle') { if (state.vehicles.length === 0) addVehicle(); else renderVehicles(); }
+    if (id === 'ambulance-select') renderAmbSelect();
+    if (id === 'vehicles')    renderVehiclesApp();
+    if (id === 'documents')   renderDocuments();
+    origShow(id);
+    if (id === 'otp') { resetOtpCells(); startOtpTimer(); setTimeout(()=>document.querySelector('.otp-cell')?.focus(), 60); }
+    if (id === 'ride-request') startRideCountdown();
+    if (typeof updateDemoActive === 'function') updateDemoActive();
+  };
+
+  /* ---- OTP cell behavior: auto-advance + backspace ---- */
+  const cells = () => [...document.querySelectorAll('#otpBoxes .otp-cell')];
+  function resetOtpCells() { cells().forEach(c => { c.value=''; c.classList.remove('filled'); }); }
+  cells().forEach((cell, i) => {
+    cell.addEventListener('input', e => {
+      cell.value = cell.value.replace(/\D/g,'').slice(0,1);
+      cell.classList.toggle('filled', !!cell.value);
+      if (cell.value && i < 5) cells()[i+1].focus();
+    });
+    cell.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !cell.value && i > 0) cells()[i-1].focus();
+    });
+  });
+
+  /* ---- resend countdown ---- */
+  let otpInt = null;
+  function startOtpTimer() {
+    let t = 30;
+    const timer = document.getElementById('resendTimer');
+    const btn = document.getElementById('resendBtn');
+    btn.style.display = 'none'; timer.style.display = 'inline';
+    clearInterval(otpInt);
+    const tick = () => {
+      const m = Math.floor(t/60), s = String(t%60).padStart(2,'0');
+      timer.textContent = `Resend code in ${m}:${s}`;
+      if (t <= 0) { clearInterval(otpInt); timer.style.display='none'; btn.style.display='inline'; }
+      t--;
+    };
+    tick();
+    otpInt = setInterval(tick, 1000);
+  }
+
+  /* ============ MOCK DATA ============ */
+  const AMBS = [
+    { num:'KA01AB1234', type:'ALS', status:'verified', model:'Force Traveller' },
+    { num:'KA05CD5678', type:'BLS', status:'verified', model:'Maruti Eeco' },
+  ];
+  let activeAmb = 0;
+
+  const DOC_STATE = [
+    { name:'Driving License',          sub:'Valid till Mar 2028',     status:'verified' },
+    { name:'Aadhaar Card',             sub:'Identity confirmed',      status:'verified' },
+    { name:'PAN Card',                 sub:'Submitted · awaiting check', status:'pending' },
+    { name:'Police Verification',      sub:'Clearer copy requested',  status:'reupload' },
+    { name:'Medical Certificate',      sub:'Valid till Jan 2027',     status:'verified' },
+    { name:'RC · Ambulance 1',         sub:'Valid till 2027',         status:'verified' },
+    { name:'Insurance · Ambulance 1',  sub:'Expires in 18 days',      status:'expiring' },
+    { name:'Pollution · Ambulance 1',  sub:'Expired 3 days ago',      status:'expired' },
+  ];
+  const BADGE = {
+    verified:['b-verified','Verified'], pending:['b-pending','Pending Verification'],
+    reupload:['b-reupload','Re-upload'], expiring:['b-expiring','Expiring Soon'],
+    expired:['b-expired','Expired'],
+  };
+
+  /* ============ DEMO CONTROL PANEL ============ */
+  const DEMO = [
+    { sec:'Authentication', items:[
+      ['Splash','splash'], ['Login','login'], ['OTP','otp'], ['Register','registration'],
+    ]},
+    { sec:'Driver Types → verify OTP', items:[
+      ['Agency Driver','otp',{type:'agency',count:2}],
+      ['Approved · 1 Ambulance','otp',{type:'approved',count:1}],
+      ['Approved · 2 Ambulances','otp',{type:'approved',count:2}],
+      ['Pending Verification','otp',{type:'pending'}],
+      ['Correction Required','otp',{type:'correction'}],
+      ['New Individual Driver','otp',{type:'new'}],
+    ]},
+    { sec:'Registration States', items:[
+      ['Pending Verification','pending'], ['Correction Required','correction'],
+      ['Registration Approved','approved'],
+    ]},
+    { sec:'Driver Entry', items:[
+      ['Ambulance Selection','ambulance-select'], ['Driver Dashboard','dashboard'],
+    ]},
+    { sec:'Ride Flow', items:[
+      ['Dashboard (Offline)','dashboard'], ['Waiting for Ride','waiting'],
+      ['Incoming Ride Request','ride-request'], ['Ride Accepted','ride-accepted'],
+      ['Navigate to Pickup','navigate-pickup'], ['Arrived at Pickup','arrived-pickup'],
+      ['Patient Onboard','patient-onboard'], ['Navigate to Destination','navigate-destination'],
+      ['Trip Completed','trip-completed'],
+    ]},
+    { sec:'More', items:[
+      ['Earnings','earnings'], ['Profile','profile'], ['My Vehicles','vehicles'],
+      ['Documents','documents'], ['Support','support'],
+    ]},
+  ];
+
+  /* ============ APP RENDER FUNCTIONS ============ */
+  const ambIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17h6M5 17H3v-6l2-5h11l4 5v6h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M11 8v4M9 10h4"/></svg>`;
+
+  function renderAmbSelect() {
+    document.getElementById('ambList').innerHTML = AMBS.map((a,i) => `
+      <div class="amb-opt ${activeAmb===i?'on':''}" onclick="pickAmb(${i})">
+        <div class="amb-ico">${ambIcon}</div>
+        <div><div class="amb-num">${a.num}</div><div class="amb-meta">${a.type} · ${a.model}</div></div>
+        <div class="radio"></div>
+      </div>`).join('');
+  }
+  function pickAmb(i){ activeAmb=i; renderAmbSelect(); const d=document.getElementById('dashAmb'); if(d) d.textContent=`${AMBS[i].num} · ${AMBS[i].type}`; }
+
+  function renderVehiclesApp() {
+    document.getElementById('vehAppList').innerHTML = AMBS.map((a,i) => `
+      <div class="card flat">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <div class="amb-ico" style="width:44px;height:44px;">${ambIcon}</div>
+          <div style="flex:1;"><div class="amb-num">${a.num}</div><div class="amb-meta">${a.type} · ${a.model}</div></div>
+          ${activeAmb===i?'<span class="type-tag">ACTIVE TODAY</span>':''}
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="badge b-verified"><span class="dotmark"></span>RC Verified</span>
+          <span class="badge b-verified"><span class="dotmark"></span>Fitness OK</span>
+          ${i===0?'<span class="badge b-expiring">Pollution expiring</span>':'<span class="badge b-verified"><span class="dotmark"></span>Insured</span>'}
+        </div>
+      </div>`).join('');
+  }
+
+  function renderDocuments() {
+    document.getElementById('docAppList').innerHTML = `<div class="card">` + DOC_STATE.map(d => {
+      const [cls,txt] = BADGE[d.status];
+      return `<div class="list-row">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="lr-main"><div class="lr-t">${d.name}</div><div class="lr-s">${d.sub}</div></div>
+        <span class="badge ${cls}">${txt}</span>
+      </div>`;
+    }).join('') + `</div>`;
+  }
+
+  function toggleOnline(){ showScreen('waiting'); }
+
+  /* ---- driver-type state + OTP routing ---- */
+  function setDriver(type, count){
+    state.driverType = type;
+    if (count) state.vehCount = count;
+    showScreen('otp');           // land on OTP so reviewer can verify into the right flow
+  }
+  function verifyOtp(){
+    switch (state.driverType) {
+      case 'agency':
+        // agency: pick assigned ambulance if more than one, else straight to dashboard
+        showScreen(state.vehCount > 1 ? 'ambulance-select' : 'dashboard');
+        break;
+      case 'approved':
+        // approved individual: select only when 2 ambulances exist
+        showScreen(state.vehCount > 1 ? 'ambulance-select' : 'dashboard');
+        break;
+      case 'pending':
+        showScreen('pending');
+        break;
+      case 'correction':
+        showScreen('correction');
+        break;
+      case 'new':
+      default:
+        showScreen('registration');   // unregistered number -> register flow
+    }
+  }
+
+  /* ride-request countdown */
+  let rideCdInt=null;
+  function startRideCountdown(){
+    let t=15; const el=document.getElementById('rideCd'); if(!el)return;
+    el.textContent=t; clearInterval(rideCdInt);
+    rideCdInt=setInterval(()=>{ t--; if(t<=0){clearInterval(rideCdInt);t=0;} el.textContent=t; },1000);
+  }
+  function renderDemo() {
+    document.getElementById('demoBody').innerHTML = DEMO.map(g =>
+      `<div class="demo-sec">${g.sec}</div>` +
+      g.items.map(([label,id,opts]) => {
+        const exists = !!document.getElementById(id);
+        const onclick = opts
+          ? `setDriver('${opts.type}'${opts.count?(','+opts.count):''})`
+          : `showScreen('${id}')`;
+        return `<button class="demo-btn" data-id="${opts?'':id}" onclick="${onclick}">
+          <span>${label}</span>${exists?'':'<span class="soon">SOON</span>'}</button>`;
+      }).join('')
+    ).join('');
+    updateDemoActive();
+  }
+  function updateDemoActive() {
+    document.querySelectorAll('.demo-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.id === currentScreen));
+  }
+  renderDemo();
+
+  // boot on splash, auto-advance to login
+  showScreen('splash');
+  setTimeout(() => { if (currentScreen === 'splash') showScreen('login'); }, 2200);
+</script>
+</body>
+</html>
