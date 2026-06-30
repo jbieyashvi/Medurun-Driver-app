@@ -282,7 +282,13 @@
   .limit-note.show { display: block; }
 
   /* ============ MAP-FIRST DASHBOARD (screen is already position:absolute) ============ */
-  .map.dash-map { position: absolute; top: 0; left: 0; right: 0; bottom: 62px; border-bottom-left-radius: 22px; border-bottom-right-radius: 22px; overflow: hidden; background: #E7EBF1; }
+  .map.dash-map { position: absolute; top: 0; left: 0; right: 0; bottom: 62px; border-bottom-left-radius: 22px; border-bottom-right-radius: 22px; overflow: hidden; background: #E7EBF1; transition: filter .42s ease; }
+  /* OFFLINE: muted, desaturated, slightly dimmed */
+  #dashboard .map.dash-map { filter: saturate(.62) brightness(.95); }
+  #dashboard .amb-marker .amb-pulse { display: none; }
+  #dashboard .amb-marker .amb-pin { background: linear-gradient(150deg, #9C95AC, #6E6781); box-shadow: 0 6px 14px -8px rgba(20,18,26,.4); }
+  /* ONLINE: full colour, active marker (waiting screen keeps defaults + search pulse) */
+  #waiting .map.dash-map { filter: saturate(1) brightness(1); }
   /* faux street grid — subtle so overlays stay readable */
   .map.dash-map::before {
     content: ''; position: absolute; inset: -10%;
