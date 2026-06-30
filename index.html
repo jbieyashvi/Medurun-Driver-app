@@ -2016,7 +2016,7 @@
   function handleLoginOtpVerified(){
     switch (prototypeState.driverScenario) {
       case "agencyDriver":
-        navigateTo("agency-detected"); // welcome -> Dashboard (agency ambulance pre-assigned, no selection)
+        navigateTo("dashboard"); // agency ambulance pre-assigned -> straight to dashboard
         break;
       case "approvedIndividual":
         navigateTo(vehCount > 1 ? "ambulanceSelection" : "dashboard"); // selection only when 2 vehicles
