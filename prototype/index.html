@@ -1022,15 +1022,16 @@
         <div class="card flat" style="margin-top:20px;">
           <div class="sum-row"><span class="k">Agency</span><span class="v">LifeLine Ambulance Services</span></div>
           <div class="sum-row"><span class="k">Driver</span><span class="v">Rahul Sharma</span></div>
+          <div class="sum-row"><span class="k">Assigned ambulance</span><span class="v">KA01AB1234 · ALS</span></div>
           <div class="sum-row"><span class="k">Status</span><span class="v"><span class="badge b-verified"><span class="dotmark"></span>Verified Agency Driver</span></span></div>
         </div>
 
-        <div class="hint" style="text-align:center;padding:0 6px;margin-top:4px;">Your agency has already completed your onboarding. Please select today's assigned ambulance to continue.</div>
+        <div class="hint" style="text-align:center;padding:0 6px;margin-top:4px;">Your agency has already completed your onboarding and assigned your ambulance. Continue to your dashboard.</div>
 
         <div class="spacer"></div>
 
-        <button class="btn" onclick="navigateTo('ambulance-select')">
-          Select Today's Ambulance
+        <button class="btn" onclick="navigateTo('dashboard')">
+          Continue to Dashboard
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
         <button class="btn outline" style="margin-top:10px;" onclick="navigateTo('login')">Sign in with another account</button>
@@ -1808,7 +1809,13 @@
     if (id === 'reg-vehicle-docs') renderVehicleDocs();
     if (id === 'reg-photos')  renderPhotos();
     if (id === 'reg-videos')  renderVideos();
-    if (id === 'dashboard') document.getElementById('dashSheet')?.classList.remove('expanded');
+    if (id === 'dashboard') {
+      document.getElementById('dashSheet')?.classList.remove('expanded');
+      const a = document.getElementById('dashAmb');
+      if (a) a.textContent = prototypeState.driverScenario === 'agencyDriver'
+        ? 'KA01AB1234 · ALS · LifeLine'
+        : `${ambList()[activeAmb<0?0:activeAmb].num} · ${ambList()[activeAmb<0?0:activeAmb].type}`;
+    }
     if (id === 'waiting') document.getElementById('waitSheet')?.classList.remove('expanded');
     if (id === 'ambulance-select') { if (prototypeState.driverScenario === 'agencyDriver') activeAmb = -1; showNote('noteAmb', false); renderAmbSelect(); }
     if (id === 'vehicles')    renderVehiclesApp();
@@ -1816,7 +1823,7 @@
     origShow(id);
     if (id === 'otp') { resetOtpCells(); startOtpTimer(); setTimeout(()=>document.querySelector('.otp-cell')?.focus(), 60); }
     if (id === 'ride-request') startRideCountdown();
-    if (id === 'agency-detected') setTimeout(()=>{ if (prototypeState.currentScreen === 'agency-detected') navigateTo('ambulance-select'); }, 1500);
+    if (id === 'agency-detected') setTimeout(()=>{ if (prototypeState.currentScreen === 'agency-detected') navigateTo('dashboard'); }, 1500);
     if (typeof updateDemoActive === 'function') updateDemoActive();
   };
 
@@ -2009,10 +2016,10 @@
   function handleLoginOtpVerified(){
     switch (prototypeState.driverScenario) {
       case "agencyDriver":
-        navigateTo("agency-detected"); // detected -> select today's ambulance -> dashboard
+        navigateTo("agency-detected"); // welcome -> Dashboard (agency ambulance pre-assigned, no selection)
         break;
       case "approvedIndividual":
-        navigateTo(vehCount > 1 ? "ambulanceSelection" : "dashboard");
+        navigateTo(vehCount > 1 ? "ambulanceSelection" : "dashboard"); // selection only when 2 vehicles
         break;
       case "pendingVerification":
         navigateTo("pendingVerification");
