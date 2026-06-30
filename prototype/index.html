@@ -52,6 +52,8 @@
   .demo-head { padding: 18px 18px 14px; border-bottom: 1px solid #2A2636; }
   .demo-head .t { font-size: 13px; font-weight: 700; letter-spacing: .02em; }
   .demo-head .s { font-size: 10.5px; color: #8A82A0; margin-top: 3px; letter-spacing: .04em; text-transform: uppercase; }
+  .scenario-badge { margin-top: 9px; font-size: 10.5px; font-weight: 600; color: #C9C3DA; background: #211D2E; border: 1px solid #2A2636; border-radius: 8px; padding: 6px 9px; }
+  .scenario-badge b { color: var(--purple-400); font-weight: 700; }
   .demo-body { flex: 1; overflow-y: auto; padding: 12px 14px 24px; }
   .demo-body::-webkit-scrollbar { width: 6px; }
   .demo-body::-webkit-scrollbar-thumb { background: #2A2636; border-radius: 99px; }
@@ -278,6 +280,111 @@
   .add-veh:disabled { opacity: .45; cursor: not-allowed; }
   .limit-note { margin-top: 12px; font-size: 12.5px; line-height: 1.5; color: #B45309; background: #FEF6E7; border: 1px solid #FAE3B5; border-radius: 12px; padding: 12px 14px; display: none; }
   .limit-note.show { display: block; }
+
+  /* ============ MAP-FIRST DASHBOARD (screen is already position:absolute) ============ */
+  .map.dash-map { position: absolute; top: 0; left: 0; right: 0; bottom: 62px; border-bottom-left-radius: 22px; border-bottom-right-radius: 22px; overflow: hidden; background: #E7EBF1; }
+  /* faux street grid — subtle so overlays stay readable */
+  .map.dash-map::before {
+    content: ''; position: absolute; inset: -10%;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 70px, #fff 70px 79px),
+      repeating-linear-gradient(90deg, transparent 0 58px, #fff 58px 66px);
+    transform: rotate(-7deg);
+  }
+  .map.dash-map::after {
+    content: ''; position: absolute; inset: -10%;
+    background:
+      linear-gradient(72deg, transparent 0 46%, #fff 46% 49%, transparent 49%),
+      linear-gradient(155deg, transparent 0 62%, #fff 62% 66%, transparent 66%);
+  }
+  .map-blocks span { position: absolute; border-radius: 10px; opacity: .9; }
+  .map-blocks .park  { left: 8%;  top: 18%; width: 90px; height: 70px; background: #DCEEDD; }
+  .map-blocks .water { right: -6%; bottom: 16%; width: 130px; height: 120px; background: #D6E6F2; transform: rotate(8deg); }
+  .map-blocks .plot  { left: 56%; top: 12%; width: 60px; height: 50px; background: #EDE7F8; }
+
+  /* custom ambulance marker */
+  .amb-marker { position: absolute; left: 50%; top: 47%; transform: translate(-50%,-50%); z-index: 3; }
+  .amb-marker .amb-pulse { position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; transform: translate(-50%,-50%); border-radius: 50%; background: rgba(124,58,237,.18); animation: breathe 2.6s ease-in-out infinite; }
+  .amb-marker .amb-pin { position: relative; width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(150deg, var(--purple-500), var(--purple-700)); border: 3px solid #fff; box-shadow: 0 8px 18px -6px rgba(124,58,237,.6); display: flex; align-items: center; justify-content: center; }
+  .amb-marker .amb-pin svg { width: 19px; height: 19px; color: #fff; }
+  .amb-marker .amb-pin::after { content: ''; position: absolute; bottom: -7px; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: #fff; }
+
+  /* compact floating top bar */
+  .map-topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 8; display: flex; align-items: center; gap: 9px; padding: 34px 14px 0; }
+  .map-topbar .bar { flex: 1; display: flex; align-items: center; gap: 9px; background: rgba(255,255,255,.95); backdrop-filter: blur(8px); border-radius: 13px; padding: 6px 10px; box-shadow: 0 6px 18px -12px rgba(20,18,26,.28); }
+  .map-topbar .avatar { width: 30px; height: 30px; font-size: 12px; }
+  .map-topbar .info .n { font-size: 13px; font-weight: 700; color: var(--ink-900); line-height: 1.1; }
+  .map-topbar .info .v { font-size: 10.5px; color: var(--ink-500); margin-top: 1px; }
+  .map-topbar .notif { width: 38px; height: 38px; border-radius: 12px; background: rgba(255,255,255,.95); backdrop-filter: blur(8px); box-shadow: 0 6px 18px -12px rgba(20,18,26,.28); display: flex; align-items: center; justify-content: center; color: var(--ink-700); cursor: pointer; flex-shrink: 0; position: relative; }
+  .map-topbar .notif svg { width: 17px; height: 17px; }
+  .map-topbar .notif .nd { position: absolute; top: 8px; right: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--purple-500); border: 1.5px solid #fff; }
+
+  /* floating status card */
+  /* compact floating status — single row, ~40% shorter */
+  .status-float { position: absolute; left: 14px; right: 14px; bottom: 220px; z-index: 7; background: #fff; border-radius: 14px; padding: 10px 12px; box-shadow: 0 10px 26px -16px rgba(20,18,26,.3); display: flex; align-items: center; gap: 11px; transition: opacity .25s, transform .25s; }
+  .status-float .sf-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ink-300); flex-shrink: 0; }
+  .status-float.online .sf-dot { background: #1F9D4D; box-shadow: 0 0 0 4px rgba(31,157,77,.16); }
+  .status-float .sf-txt { flex: 1; min-width: 0; }
+  .status-float .sf-state { font-size: 13.5px; font-weight: 700; color: var(--ink-900); line-height: 1.1; }
+  .status-float .sf-sub { font-size: 10.5px; color: var(--ink-500); margin-top: 2px; }
+  .sf-cta { flex-shrink: 0; height: 36px; padding: 0 16px; border: none; border-radius: 10px; background: linear-gradient(180deg, var(--purple-500), var(--purple-600)); color: #fff; font-size: 13px; font-weight: 650; cursor: pointer; box-shadow: 0 6px 14px -10px rgba(124,58,237,.5); }
+  .sf-end { flex-shrink: 0; font-size: 12px; font-weight: 650; color: var(--purple-600); background: var(--purple-50); padding: 7px 12px; border-radius: 9px; cursor: pointer; }
+
+  /* compact stat row for incoming ride sheet */
+  .ride-stats { display: flex; gap: 8px; margin: 2px 0 12px; }
+  .ride-stats .rs { flex: 1; border: 1.5px solid var(--line); border-radius: 11px; padding: 8px 9px; }
+  .ride-stats .rs .v { font-size: 14px; font-weight: 800; color: var(--ink-900); letter-spacing: -0.02em; }
+  .ride-stats .rs .l { font-size: 9.5px; color: var(--ink-500); margin-top: 1px; }
+
+  /* draggable bottom sheet */
+  .dash-sheet { position: absolute; left: 0; right: 0; bottom: 62px; z-index: 9; background: #fff; border-radius: 22px 22px 0 0; box-shadow: 0 -14px 34px -18px rgba(20,18,26,.28); height: 150px; overflow: hidden; transition: height .32s cubic-bezier(.16,1,.3,1); padding: 0 18px; }
+  .dash-sheet.expanded { height: 470px; overflow-y: auto; }
+  .dash-sheet::-webkit-scrollbar { width: 0; }
+  .dash-grab { width: 38px; height: 4px; border-radius: 99px; background: var(--line); margin: 10px auto 8px; cursor: pointer; }
+  .dash-head { display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 2px 0 10px; }
+  .dash-head .dh-t { font-size: 13px; font-weight: 700; color: var(--ink-900); }
+  .dash-head .dh-caret { width: 16px; height: 16px; color: var(--ink-300); transition: transform .3s; }
+  .dash-sheet.expanded .dash-head .dh-caret { transform: rotate(180deg); }
+  .dash-stats { display: flex; gap: 7px; padding-bottom: 12px; }
+  .dash-stats .ds { flex: 1; border: 1.5px solid var(--line); border-radius: 12px; padding: 8px 6px; text-align: center; }
+  .dash-stats .ds .v { font-size: 15px; font-weight: 800; color: var(--ink-900); letter-spacing: -0.02em; }
+  .dash-stats .ds .l { font-size: 9.5px; color: var(--ink-500); margin-top: 2px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
+  .dash-stats .ds.alert .l::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #E0A106; }
+  .quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+  .quick-act { border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 5px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; font-size: 10px; font-weight: 600; color: var(--ink-700); text-align: center; }
+  .quick-act svg { width: 18px; height: 18px; color: var(--purple-600); }
+  .quick-act.sos { border-color: #F5C6C2; background: #FEF4F3; color: #C0392B; }
+  .quick-act.sos svg { color: #C0392B; }
+
+  /* tighter, lighter cards inside the dashboard sheet */
+  .dash-sheet .card { padding: 11px 12px; margin-bottom: 8px; }
+  .dash-sheet .list-row { padding: 7px 0; gap: 10px; }
+  .dash-sheet .list-row .ico { width: 34px; height: 34px; border-radius: 10px; }
+  .dash-sheet .list-row .ico svg { width: 16px; height: 16px; }
+  .dash-sheet .list-row .lr-t { font-size: 13px; }
+  .dash-sheet .list-row .lr-s { font-size: 11px; }
+  .dash-sheet .sec-title { font-size: 12.5px; margin: 12px 2px 7px; }
+
+  /* severity badges */
+  .badge.b-info   { color: #1F9D4D; background: #EEF9F0; }
+  .badge.b-danger { color: #C0392B; background: #FDEDEC; }
+
+  /* searching pulse (waiting state) */
+  .search-pulse { position: absolute; top: 44%; left: 50%; transform: translate(-50%,-50%); width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; z-index: 2; }
+  .search-pulse > span { position: absolute; width: 46px; height: 46px; border-radius: 50%; border: 2px solid #C9B6F5; animation: ringout 1.9s ease-out infinite; }
+  .search-pulse > span:nth-child(2) { animation-delay: .95s; }
+  .search-pulse .map-car { box-shadow: 0 6px 18px -4px rgba(0,0,0,.3); }
+
+  /* validation note */
+  .val-note { margin-top: 4px; font-size: 12px; font-weight: 600; color: #C0392B; background: #FDEDEC; border: 1px solid #F5C6C2; border-radius: 10px; padding: 9px 12px; display: none; }
+  .val-note.show { display: block; }
+
+  /* vehicle photo grid */
+  .photo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; }
+  .photo-tile { border: 1.6px dashed #CFC7E0; background: var(--purple-50); border-radius: 12px; min-height: 78px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; color: var(--purple-600); font-size: 10.5px; font-weight: 600; text-align: center; padding: 8px 6px; transition: all .15s; }
+  .photo-tile svg { width: 19px; height: 19px; }
+  .photo-tile.done { border-style: solid; border-color: #BBE5C4; background: #EEF9F0; color: #1F9D4D; }
+  .photo-tile .pt-label { line-height: 1.2; }
 
   /* ============ REUSABLE: REVIEW SUMMARY ============ */
   .sum-card { border: 1.5px solid var(--line); border-radius: var(--radius-card); padding: 15px; margin-bottom: 11px; }
@@ -563,12 +670,12 @@
           </div>
           <div class="hint">We'll send a 6-digit OTP to verify this number.</div>
 
-          <button class="btn" style="margin-top:24px;" onclick="state.driverType='new'; showScreen('otp')">
+          <button class="btn" style="margin-top:24px;" onclick="startOtp('login')">
             Continue
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
 
-          <div class="textlink" style="margin-top:20px;">New Driver? <a onclick="state.driverType='new'; showScreen('registration')">Register Here</a></div>
+          <div class="textlink" style="margin-top:20px;">Onboarding as an individual driver?<br><a onclick="navigateTo('mobile-verify')">Register Now</a></div>
         </div>
 
         <div class="spacer"></div>
@@ -580,11 +687,49 @@
       </div>
     </section>
 
+    <!-- ============ MOBILE VERIFICATION (Individual registration entry) ============ -->
+    <section class="screen" id="mobile-verify">
+      <div class="pad">
+        <div class="topbar">
+          <div class="back" onclick="navigateTo('login')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </div>
+        </div>
+        <div class="heading">
+          <h2>Onboard as<br>Individual Driver</h2>
+          <p>Verify your mobile number to start registration.</p>
+        </div>
+
+        <div style="margin-top:24px;">
+          <div class="label">Mobile number</div>
+          <div class="phone-input">
+            <div class="cc">
+              <span class="flag">🇮🇳</span><span>+91</span>
+              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <input class="field num" type="tel" inputmode="numeric" maxlength="10" placeholder="00000 00000" />
+          </div>
+          <div class="hint">We'll send a 6-digit OTP to verify this number.</div>
+
+          <button class="btn" style="margin-top:24px;" onclick="startOtp('registration')">
+            Continue
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="terms">
+          Agency drivers are onboarded by their agency. Please sign in using the mobile number shared by your agency.
+        </div>
+      </div>
+    </section>
+
     <!-- ================= OTP VERIFICATION ================= -->
     <section class="screen" id="otp">
       <div class="pad">
         <div class="topbar">
-          <div class="back" onclick="showScreen('login')">
+          <div class="back" onclick="navigateTo(prototypeState.otpContext==='registration'?'mobile-verify':'login')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
           </div>
         </div>
@@ -593,7 +738,7 @@
           <h2>Verify your number</h2>
           <p>Enter the 6-digit code sent to<br>
             <strong id="otpNumber" style="color:var(--ink-900);">+91 00000 00000</strong>
-            &nbsp;<a class="edit-num" onclick="showScreen('login')">Edit</a>
+            &nbsp;<a class="edit-num" onclick="navigateTo(prototypeState.otpContext==='registration'?'mobile-verify':'login')">Edit</a>
           </p>
         </div>
 
@@ -613,7 +758,7 @@
 
         <div class="spacer"></div>
 
-        <button class="btn" onclick="verifyOtp()">
+        <button class="btn" onclick="handleOtpVerified()">
           Verify &amp; Continue
         </button>
         <p class="otp-foot">Didn't get it? Check your SMS, or wait for the timer to resend.</p>
@@ -629,14 +774,14 @@
           </div>
         </div>
         <div class="stepper">
-          <div class="track"><div class="fill" style="width:25%"></div></div>
-          <div class="count">Step 1 of 4</div>
+          <div class="track"><div class="fill" style="width:17%"></div></div>
+          <div class="count">Step 1 of 6</div>
         </div>
         <div class="heading"><h2>Personal details</h2><p>Tell us about yourself.</p></div>
       </div>
       <div class="scroll" style="padding-top:16px;">
         <div class="field-group"><div class="mini-label">Full name</div><input class="field sm" id="r_name" placeholder="e.g. Rahul Sharma" /></div>
-        <div class="field-group"><div class="mini-label">Mobile number</div><input class="field sm" id="r_mobile" readonly style="background:var(--purple-50);color:var(--purple-700);font-weight:700;" /></div>
+        <div class="field-group"><div class="mini-label">Mobile number (verified)</div><input class="field sm" id="r_mobile" readonly style="background:var(--purple-50);color:var(--purple-700);font-weight:700;" /></div>
         <div class="field-group"><div class="mini-label">Email address</div><input class="field sm" id="r_email" type="email" placeholder="name@email.com" /></div>
         <div class="field-group"><div class="mini-label">City</div><input class="field sm" id="r_city" placeholder="e.g. Bengaluru" /></div>
         <div class="field-group"><div class="mini-label">Date of birth</div><input class="field sm" id="r_dob" type="date" /></div>
@@ -661,16 +806,19 @@
           </div>
         </div>
         <div class="stepper">
-          <div class="track"><div class="fill" style="width:50%"></div></div>
-          <div class="count">Step 2 of 4</div>
+          <div class="track"><div class="fill" style="width:33%"></div></div>
+          <div class="count">Step 2 of 6</div>
         </div>
         <div class="heading"><h2>Driver documents</h2><p>Upload your verification documents.</p></div>
       </div>
-      <div class="scroll" style="padding-top:16px;" id="docList"><!-- JS rendered --></div>
-      <div class="actionbar"><button class="btn" onclick="showScreen('reg-vehicle')">Continue</button></div>
+      <div class="scroll" style="padding-top:16px;">
+        <div id="docList"><!-- JS rendered --></div>
+        <div class="val-note" id="noteDocs">Please upload all required documents before continuing.</div>
+      </div>
+      <div class="actionbar"><button class="btn" onclick="nextDriverDocs()">Continue</button></div>
     </section>
 
-    <!-- ============ STEP 3 — ADD AMBULANCE ============ -->
+    <!-- ============ STEP 3 — AMBULANCE DETAILS ============ -->
     <section class="screen" id="reg-vehicle">
       <div class="step-head">
         <div class="topbar">
@@ -679,10 +827,10 @@
           </div>
         </div>
         <div class="stepper">
-          <div class="track"><div class="fill" style="width:75%"></div></div>
-          <div class="count">Step 3 of 4</div>
+          <div class="track"><div class="fill" style="width:50%"></div></div>
+          <div class="count">Step 3 of 6</div>
         </div>
-        <div class="heading"><h2>Add ambulance</h2><p>Register up to 2 ambulances.</p></div>
+        <div class="heading"><h2>Ambulance details</h2><p>Register up to 2 ambulances.</p></div>
       </div>
       <div class="scroll" style="padding-top:16px;">
         <div class="counter-pill" id="vehCounter">
@@ -694,13 +842,14 @@
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Add ambulance
         </button>
-        <div class="limit-note" id="limitNote">Individual Drivers can register a maximum of 2 ambulances. To manage more vehicles, please register as an Agency.</div>
+        <div class="limit-note" id="limitNote">Drivers with more than 2 ambulances must register as an Agency.</div>
+        <div class="val-note" id="noteVeh">Add at least one ambulance with vehicle number and type.</div>
       </div>
-      <div class="actionbar"><button class="btn" onclick="goReview()">Continue</button></div>
+      <div class="actionbar"><button class="btn" onclick="nextVehicleDetails()">Continue</button></div>
     </section>
 
-    <!-- ============ STEP 4 — REVIEW & SUBMIT ============ -->
-    <section class="screen" id="reg-review">
+    <!-- ============ STEP 4 — AMBULANCE DOCUMENTS ============ -->
+    <section class="screen" id="reg-vehicle-docs">
       <div class="step-head">
         <div class="topbar">
           <div class="back" onclick="showScreen('reg-vehicle')">
@@ -708,13 +857,76 @@
           </div>
         </div>
         <div class="stepper">
+          <div class="track"><div class="fill" style="width:67%"></div></div>
+          <div class="count">Step 4 of 6</div>
+        </div>
+        <div class="heading"><h2>Ambulance documents</h2><p>Upload documents for each ambulance.</p></div>
+      </div>
+      <div class="scroll" style="padding-top:16px;">
+        <div id="vehDocList"><!-- JS rendered --></div>
+        <div class="val-note" id="noteVehDocs">Please upload all required ambulance documents before continuing.</div>
+      </div>
+      <div class="actionbar"><button class="btn" onclick="nextVehicleDocs()">Continue</button></div>
+    </section>
+
+    <!-- ============ STEP 5 — VEHICLE PHOTO VERIFICATION ============ -->
+    <section class="screen" id="reg-photos">
+      <div class="step-head">
+        <div class="topbar">
+          <div class="back" onclick="showScreen('reg-vehicle-docs')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </div>
+        </div>
+        <div class="stepper">
+          <div class="track"><div class="fill" style="width:83%"></div></div>
+          <div class="count">Step 5 of 6</div>
+        </div>
+        <div class="heading"><h2>Vehicle photos</h2><p>Capture each required angle.</p></div>
+      </div>
+      <div class="scroll" style="padding-top:16px;">
+        <div id="photoList"><!-- JS rendered --></div>
+        <div class="val-note" id="notePhotos">Please upload all required vehicle photos before continuing.</div>
+      </div>
+      <div class="actionbar"><button class="btn" onclick="nextPhotos()">Continue</button></div>
+    </section>
+
+    <!-- ============ STEP 6 — FUNCTIONAL VIDEOS (ALS/ICU only) ============ -->
+    <section class="screen" id="reg-videos">
+      <div class="step-head">
+        <div class="topbar">
+          <div class="back" onclick="showScreen('reg-photos')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </div>
+        </div>
+        <div class="stepper">
           <div class="track"><div class="fill" style="width:100%"></div></div>
-          <div class="count">Step 4 of 4</div>
+          <div class="count">Step 6 of 6</div>
+        </div>
+        <div class="heading"><h2>Functional videos</h2><p>Required for ALS / ICU ambulances.</p></div>
+      </div>
+      <div class="scroll" style="padding-top:16px;">
+        <div id="videoList"><!-- JS rendered --></div>
+        <div class="val-note" id="noteVideos">Please upload all required functional videos before continuing.</div>
+      </div>
+      <div class="actionbar"><button class="btn" onclick="nextVideos()">Continue</button></div>
+    </section>
+
+    <!-- ============ REVIEW & SUBMIT ============ -->
+    <section class="screen" id="reg-review">
+      <div class="step-head">
+        <div class="topbar">
+          <div class="back" onclick="backFromReview()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </div>
+        </div>
+        <div class="stepper">
+          <div class="track"><div class="fill" style="width:100%"></div></div>
+          <div class="count">Review</div>
         </div>
         <div class="heading"><h2>Review &amp; submit</h2><p>Confirm your details before submitting.</p></div>
       </div>
       <div class="scroll" style="padding-top:16px;" id="reviewBody"><!-- JS rendered --></div>
-      <div class="actionbar"><button class="btn" onclick="showScreen('reg-success')">Submit for Verification</button></div>
+      <div class="actionbar"><button class="btn" onclick="showScreen('pending')">Submit Registration</button></div>
     </section>
 
     <!-- ============ SUCCESS ============ -->
@@ -786,47 +998,144 @@
       <div class="actionbar2"><button class="btn" onclick="showScreen('ambulance-select')">Continue</button></div>
     </section>
 
+    <!-- ============ ACCOUNT NOT FOUND (unregistered number on login) ============ -->
+    <section class="screen status-scr" id="account-not-found">
+      <div class="status-ico amber">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="11.5"/><line x1="11" y1="14" x2="11.01" y2="14"/></svg>
+      </div>
+      <h2>Account not found</h2>
+      <p>This mobile number is not linked to any approved driver account.<br><br>If you are an individual driver, please register first. If you are an agency driver, contact your agency admin.</p>
+      <div class="actionbar2">
+        <button class="btn" onclick="navigateTo('mobile-verify')">Register as Individual Driver</button>
+        <button class="btn outline" style="margin-top:10px;" onclick="navigateTo('login')">Back to Login</button>
+      </div>
+    </section>
+
+    <!-- ============ AGENCY DRIVER DETECTED ============ -->
+    <section class="screen" id="agency-detected">
+      <div class="pad" style="padding-top:46px;">
+        <div class="status-ico purple" style="margin:0 auto 18px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="heading" style="text-align:center;"><h2 style="font-size:24px;">Welcome back 👋</h2><p>You are registered with an ambulance agency.</p></div>
+
+        <div class="card flat" style="margin-top:20px;">
+          <div class="sum-row"><span class="k">Agency</span><span class="v">LifeLine Ambulance Services</span></div>
+          <div class="sum-row"><span class="k">Driver</span><span class="v">Rahul Sharma</span></div>
+          <div class="sum-row"><span class="k">Status</span><span class="v"><span class="badge b-verified"><span class="dotmark"></span>Verified Agency Driver</span></span></div>
+        </div>
+
+        <div class="hint" style="text-align:center;padding:0 6px;margin-top:4px;">Your agency has already completed your onboarding. Please select today's assigned ambulance to continue.</div>
+
+        <div class="spacer"></div>
+
+        <button class="btn" onclick="navigateTo('ambulance-select')">
+          Select Today's Ambulance
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+        <button class="btn outline" style="margin-top:10px;" onclick="navigateTo('login')">Sign in with another account</button>
+      </div>
+    </section>
+
     <!-- ============ AMBULANCE SELECTION (agency + individual) ============ -->
     <section class="screen" id="ambulance-select">
       <div class="app-top" style="padding-top:46px;">
-        <div><div class="ttl">Select today's ambulance</div><div class="sub">Choose the vehicle you'll drive today</div></div>
+        <div><div class="ttl">Select today's ambulance</div><div class="sub" id="ambSelectSub">Choose the vehicle you'll drive today</div></div>
       </div>
-      <div class="app-body" style="padding-bottom:24px;" id="ambList"><!-- JS rendered --></div>
-      <div class="actionbar"><button class="btn" onclick="showScreen('dashboard')">Confirm &amp; Continue</button></div>
+      <div class="app-body" style="padding-bottom:24px;">
+        <div id="ambList"><!-- JS rendered --></div>
+        <div class="val-note" id="noteAmb">Please select an ambulance to continue.</div>
+      </div>
+      <div class="actionbar"><button class="btn" onclick="confirmAmbSelect()">Continue</button></div>
     </section>
 
     <!-- ============ DASHBOARD (OFFLINE) ============ -->
     <section class="screen" id="dashboard">
-      <div class="app-top">
-        <div class="avatar">RS</div>
-        <div><div class="ttl">Hi, Rahul</div><div class="sub" id="dashAmb">KA01AB1234 · ALS</div></div>
-        <div class="right"><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div></div>
+      <!-- map hero -->
+      <div class="map dash-map">
+        <div class="map-blocks"><span class="park"></span><span class="water"></span><span class="plot"></span></div>
+        <div class="amb-marker">
+          <div class="amb-pulse"></div>
+          <div class="amb-pin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>
+        </div>
       </div>
-      <div class="app-body">
-        <div class="go-card off" id="goCard">
-          <div class="gc-top">
-            <div><div class="gc-state" id="goState">You're Offline</div><div class="gc-sub" id="goSub">Go online to receive ride requests</div></div>
-            <div class="switch" id="goSwitch" onclick="toggleOnline()"></div>
-          </div>
-          <button class="go-btn" id="goBtn" onclick="toggleOnline()">Go Online</button>
+
+      <!-- compact top bar -->
+      <div class="map-topbar">
+        <div class="bar">
+          <div class="avatar">RS</div>
+          <div class="info"><div class="n">Hi, Rahul</div><div class="v" id="dashAmb">KA01AB1234 · ALS</div></div>
+        </div>
+        <div class="notif"><span class="nd"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+      </div>
+
+      <!-- floating status card (Offline) -->
+      <div class="status-float" id="statusFloat">
+        <span class="sf-dot"></span>
+        <div class="sf-txt"><div class="sf-state">Offline</div><div class="sf-sub">Go online to receive ride requests.</div></div>
+        <button class="sf-cta" onclick="navigateTo('waiting')">Go Online</button>
+      </div>
+
+      <!-- draggable bottom sheet -->
+      <div class="dash-sheet" id="dashSheet">
+        <div class="dash-grab" onclick="toggleDashSheet()"></div>
+        <div class="dash-head" onclick="toggleDashSheet()">
+          <span class="dh-t">Today's summary</span>
+          <svg class="dh-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+        <div class="dash-stats">
+          <div class="ds"><div class="v">0</div><div class="l">Trips</div></div>
+          <div class="ds"><div class="v">₹0</div><div class="l">Earnings</div></div>
+          <div class="ds"><div class="v">0h</div><div class="l">Online</div></div>
+          <div class="ds alert"><div class="v">1</div><div class="l">Alerts</div></div>
         </div>
 
-        <div class="sec-title">Today's summary</div>
-        <div class="stat-grid">
-          <div class="stat"><div class="sv">₹0</div><div class="sl">Earnings</div></div>
-          <div class="stat"><div class="sv">0</div><div class="sl">Trips</div></div>
-          <div class="stat"><div class="sv">0h</div><div class="sl">Online</div></div>
-        </div>
-
-        <div class="sec-title">Alerts <a onclick="showScreen('documents')">View all</a></div>
+        <div class="sec-title" style="margin-top:4px;">Alerts</div>
         <div class="card">
           <div class="list-row">
+            <div class="ico" style="background:#FDEDEC;color:#C0392B;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div>
+            <div class="lr-main"><div class="lr-t">Police verification re-upload</div><div class="lr-s">Clearer copy requested by admin</div></div>
+            <span class="badge b-danger">Action Required</span>
+          </div>
+          <div class="list-row">
             <div class="ico" style="background:#FEF6E7;color:#B45309;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></div>
-            <div class="lr-main"><div class="lr-t">Pollution certificate expiring</div><div class="lr-s">Ambulance 1 · expires in 12 days</div></div>
+            <div class="lr-main"><div class="lr-t">Pollution certificate expiring</div><div class="lr-s">Ambulance 1 · in 12 days</div></div>
+            <span class="badge b-expiring">Expiring Soon</span>
+          </div>
+          <div class="list-row">
+            <div class="ico" style="background:#EEF9F0;color:#1F9D4D;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+            <div class="lr-main"><div class="lr-t">Profile verified</div><div class="lr-s">All driver documents approved</div></div>
+            <span class="badge b-info">Info</span>
+          </div>
+        </div>
+
+        <div class="sec-title">Vehicle reminders</div>
+        <div class="card">
+          <div class="list-row">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17h6M5 17H3v-6l2-5h11l4 5v6h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg></div>
+            <div class="lr-main"><div class="lr-t">Fitness check due</div><div class="lr-s">KA01AB1234 · in 26 days</div></div>
+            <span class="badge b-pending">Soon</span>
+          </div>
+        </div>
+
+        <div class="sec-title">Expiring documents</div>
+        <div class="card">
+          <div class="list-row">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div class="lr-main"><div class="lr-t">Insurance · Ambulance 1</div><div class="lr-s">Expires in 18 days</div></div>
             <span class="badge b-expiring">Expiring</span>
           </div>
         </div>
+
+        <div class="sec-title">Quick actions</div>
+        <div class="quick-grid" style="padding-bottom:16px;">
+          <div class="quick-act" onclick="showScreen('documents')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Documents</div>
+          <div class="quick-act" onclick="showScreen('support')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-5a9 9 0 0 1 18 0v5"/><path d="M21 18a2 2 0 0 1-2 2h-2v-5h2a2 2 0 0 1 2 2zM3 18a2 2 0 0 0 2 2h2v-5H5a2 2 0 0 0-2 2z"/></svg>Contact Support</div>
+          <div class="quick-act sos" onclick="showScreen('support')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Emergency SOS</div>
+          <div class="quick-act" onclick="showScreen('earnings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>Ride History</div>
+        </div>
       </div>
+
       <div class="tabbar">
         <div class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Home</div>
         <div class="tab" onclick="showScreen('earnings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><circle cx="12" cy="12" r="3"/></svg>Earnings</div>
@@ -835,37 +1144,60 @@
       </div>
     </section>
 
-    <!-- ============ WAITING FOR RIDE (ONLINE) ============ -->
+    <!-- ============ WAITING FOR RIDE (ONLINE) — map-first ============ -->
     <section class="screen" id="waiting">
-      <div class="app-top">
-        <div class="avatar">RS</div>
-        <div><div class="ttl">Hi, Rahul</div><div class="sub">KA01AB1234 · ALS</div></div>
-        <div class="right"><span class="badge b-online"><span class="dotmark"></span>Online</span></div>
-      </div>
-      <div class="app-body">
-        <div class="go-card" id="goCard2">
-          <div class="gc-top">
-            <div><div class="gc-state">You're Online</div><div class="gc-sub">Searching for nearby ride requests…</div></div>
-            <div class="switch on" onclick="showScreen('dashboard')"></div>
-          </div>
-          <button class="go-btn on" onclick="showScreen('ride-request')">Simulate Incoming Request</button>
-        </div>
-
-        <div class="card flat" style="text-align:center;padding:30px 18px;">
-          <div style="width:84px;height:84px;border-radius:50%;margin:0 auto 16px;background:var(--purple-50);display:flex;align-items:center;justify-content:center;position:relative;">
-            <span style="position:absolute;width:84px;height:84px;border-radius:50%;border:2px solid var(--purple-100);animation:ringout 1.8s ease-out infinite;"></span>
-            <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="var(--purple-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          </div>
-          <div style="font-size:15px;font-weight:700;color:var(--ink-900);">Waiting for ride requests</div>
-          <div style="font-size:12.5px;color:var(--ink-500);margin-top:5px;line-height:1.5;">Stay online and nearby. You'll be notified the moment a request arrives.</div>
-        </div>
-
-        <div class="stat-grid">
-          <div class="stat"><div class="sv">₹0</div><div class="sl">Today</div></div>
-          <div class="stat"><div class="sv">0</div><div class="sl">Trips</div></div>
-          <div class="stat"><div class="sv">12m</div><div class="sl">Online</div></div>
+      <!-- map hero with searching pulse -->
+      <div class="map dash-map">
+        <div class="map-blocks"><span class="park"></span><span class="water"></span><span class="plot"></span></div>
+        <div class="search-pulse"><span></span><span></span></div>
+        <div class="amb-marker">
+          <div class="amb-pin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>
         </div>
       </div>
+
+      <!-- compact top bar -->
+      <div class="map-topbar">
+        <div class="bar">
+          <div class="avatar">RS</div>
+          <div class="info"><div class="n">Hi, Rahul</div><div class="v">KA01AB1234 · ALS</div></div>
+          <span class="badge b-online" style="margin-left:auto;"><span class="dotmark"></span>Online</span>
+        </div>
+        <div class="notif"><span class="nd"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+      </div>
+
+      <!-- floating status card (Online) — compact, no large CTA -->
+      <div class="status-float online">
+        <span class="sf-dot"></span>
+        <div class="sf-txt"><div class="sf-state">Online</div><div class="sf-sub">Waiting for nearby emergency requests…</div></div>
+        <div class="sf-end" onclick="navigateTo('dashboard')">Go Offline</div>
+      </div>
+
+      <!-- bottom sheet -->
+      <div class="dash-sheet" id="waitSheet">
+        <div class="dash-grab" onclick="toggleSheet(this)"></div>
+        <div class="dash-head" onclick="toggleSheet(this)">
+          <span class="dh-t">Today's summary</span>
+          <svg class="dh-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+        <div class="dash-stats">
+          <div class="ds"><div class="v">0</div><div class="l">Trips</div></div>
+          <div class="ds"><div class="v">₹0</div><div class="l">Earnings</div></div>
+          <div class="ds"><div class="v">12m</div><div class="l">Online</div></div>
+          <div class="ds alert"><div class="v">1</div><div class="l">Alerts</div></div>
+        </div>
+        <div class="card flat" style="text-align:center;padding:20px 16px;margin-top:4px;">
+          <div style="font-size:14px;font-weight:700;color:var(--ink-900);">Stay online &amp; nearby</div>
+          <div style="font-size:12px;color:var(--ink-500);margin-top:4px;line-height:1.5;">You'll be notified the moment a ride request arrives.</div>
+        </div>
+        <div class="sec-title">Quick actions</div>
+        <div class="quick-grid" style="padding-bottom:16px;">
+          <div class="quick-act" onclick="showScreen('documents')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Documents</div>
+          <div class="quick-act" onclick="showScreen('support')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-5a9 9 0 0 1 18 0v5"/><path d="M21 18a2 2 0 0 1-2 2h-2v-5h2a2 2 0 0 1 2 2zM3 18a2 2 0 0 0 2 2h2v-5H5a2 2 0 0 0-2 2z"/></svg>Contact Support</div>
+          <div class="quick-act sos" onclick="showScreen('support')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Emergency SOS</div>
+          <div class="quick-act" onclick="showScreen('earnings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>Ride History</div>
+        </div>
+      </div>
+
       <div class="tabbar">
         <div class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Home</div>
         <div class="tab" onclick="showScreen('earnings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><circle cx="12" cy="12" r="3"/></svg>Earnings</div>
@@ -888,6 +1220,11 @@
           <div class="avatar">AP</div>
           <div><div class="sh-t">Apollo Hospital</div><div class="sh-s">Emergency pickup · 2.4 km away</div></div>
           <div class="sh-right"><span class="type-tag">ALS</span><div class="sh-fare" style="margin-top:6px;">₹680</div></div>
+        </div>
+        <div class="ride-stats">
+          <div class="rs"><div class="v">2.4 km</div><div class="l">Pickup distance</div></div>
+          <div class="rs"><div class="v">6 min</div><div class="l">ETA</div></div>
+          <div class="rs"><div class="v" style="color:#C0392B;">Critical</div><div class="l">Priority</div></div>
         </div>
         <div class="trip-line">
           <div class="rail"><span class="d s"></span><span class="bar"></span><span class="d e"></span></div>
@@ -1166,6 +1503,7 @@
     <div class="demo-head">
       <div class="t">Demo Control Panel</div>
       <div class="s">Prototype navigation</div>
+      <div class="scenario-badge">Scenario: <b id="scenarioBadge">newIndividual</b></div>
     </div>
     <div class="demo-body" id="demoBody"><!-- JS rendered --></div>
   </aside>
@@ -1190,90 +1528,143 @@
     personal: { name:'', mobile:'', email:'', city:'', dob:'', gender:'' },
     docs: {},          // keyed by doc id -> {uploaded, number, issue, expiry}
     vehicles: [],      // [{number, type, docs:{}}]
-    primary: 0,
-    driverType: 'new', // new | agency | approved | pending | correction
-    vehCount: 2        // ambulances on file (affects approved/agency selection skip)
+    primary: 0
   };
 
+  /* ===== CENTRALIZED PROTOTYPE STATE ===== */
+  const prototypeState = {
+    currentScreen: 'login',
+    driverScenario: 'agencyDriver', // agencyDriver | newIndividual | approvedIndividual | pendingVerification | correctionRequired
+    otpContext: 'login'              // 'login' | 'registration' (which flow opened OTP)
+  };
+  let vehCount = 2; // ambulances on file (1 -> skip selection, go to dashboard)
+
+  /* logical screen names -> actual DOM ids */
+  const SCREEN_MAP = {
+    ambulanceSelection: 'ambulance-select',
+    pendingVerification: 'pending',
+    correctionRequired: 'correction',
+    registerPersonalDetails: 'registration',
+    register: 'registration',
+    mobileVerification: 'mobile-verify'
+  };
+
+  /* one central navigation entry point — app buttons AND demo panel use this */
+  function navigateTo(screenName){
+    const id = SCREEN_MAP[screenName] || screenName;
+    prototypeState.currentScreen = id;
+    showScreen(id); // existing router: renders screen + per-screen setup + demo active/badge
+  }
+
   /* doc definitions — expiry flag synced to Super Admin Document Expiry module */
+  /* driver documents — flexible field sets (synced w/ Super Admin checklist) */
   const DRIVER_DOCS = [
-    { id:'dl',      name:'Driving License',              expiry:true },
-    { id:'aadhaar', name:'Aadhaar Card',                 expiry:false },
-    { id:'pan',     name:'PAN Card',                     expiry:false },
-    { id:'police',  name:'Police Verification Certificate', expiry:true },
-    { id:'medical', name:'Medical Certificate',          expiry:true, optional:true },
+    { id:'dl',      name:'Driving Licence', fields:[
+        {k:'number',label:'Licence number'},{k:'issue',label:'Issue date',type:'date'},{k:'expiry',label:'Expiry date',type:'date'}] },
+    { id:'pan',     name:'PAN Card', fields:[{k:'number',label:'PAN number'}] },
+    { id:'idproof', name:'Aadhaar / Voter ID', choice:['Aadhaar','Voter ID'], fields:[{k:'number',label:'ID number'}] },
+    { id:'bank',    name:'Bank Passbook', fields:[
+        {k:'bank',label:'Bank name'},{k:'account',label:'Account number'},{k:'ifsc',label:'IFSC code'}] },
+    { id:'photo',   name:'Passport Size Photo', optional:true, image:true, fields:[] },
   ];
+  const DRIVER_DOCS_REQ = ['dl','pan','idproof','bank'];
+
+  /* ambulance documents */
   const VEHICLE_DOCS = [
-    { id:'rc',        name:'RC',                    expiry:true },
-    { id:'insurance', name:'Insurance',             expiry:true },
-    { id:'fitness',   name:'Fitness Certificate',   expiry:true },
-    { id:'roadtax',   name:'Road Tax',              expiry:true },
-    { id:'pollution', name:'Pollution Certificate', expiry:true, optional:true },
+    { id:'rc',          name:'RC (Registration Certificate)', fields:[{k:'number',label:'RC number'},{k:'expiry',label:'Expiry date',type:'date'}] },
+    { id:'insurance',   name:'Insurance', fields:[{k:'number',label:'Policy number'},{k:'expiry',label:'Expiry date',type:'date'}] },
+    { id:'puc',         name:'PUC Certificate', fields:[{k:'number',label:'Certificate number'},{k:'expiry',label:'Expiry date',type:'date'}] },
+    { id:'roadtax',     name:'Road Tax Certificate', fields:[{k:'expiry',label:'Expiry date',type:'date'}] },
+    { id:'fitness',     name:'Fitness Certificate', fields:[{k:'expiry',label:'Expiry date',type:'date'}] },
+    { id:'calibration', name:'Calibration Certificate', aclsOnly:true, fields:[{k:'expiry',label:'Expiry date',type:'date'}] },
   ];
+
+  const VEH_TYPES = ['BLS','ALS','ICU','Neonatal'];
+  const PHOTO_SLOTS = ['Front Side','Right Side','Left Side','Rear Side','Odometer','Interior with Lights & Fans','Stretcher','Attender Seat','Oxygen Chamber'];
+  const VIDEO_SLOTS = ['Equipment in Switch-On Condition','Siren & Blinkers with Horn'];
+  const isACLS = t => t === 'ALS' || t === 'ICU';
+  const hasACLS = () => state.vehicles.some(v => isACLS(v.type));
 
   const docIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
   const upIcon  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`;
   const okIcon  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+  const camIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
+  const vidIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>`;
 
-  /* build a doc card; storeKey is the object holding this doc's state */
+  /* build a flexible doc card */
   function docCard(def, store, prefix) {
     const k = def.id;
-    store[k] = store[k] || { uploaded:false, number:'', issue:'', expiry:'' };
-    const expiryField = def.expiry
-      ? `<div style="flex:1;min-width:0;"><div class="mini-label">Expiry date</div><input class="field sm" type="date" onchange="setDoc('${prefix}','${k}','expiry',this.value)"></div>` : '';
+    const st = store[k] = store[k] || { uploaded:false };
+    const sub = def.optional ? 'Optional' : (def.image ? 'Image upload' : 'Required');
+    const choiceHtml = def.choice ? `
+      <div class="field-group"><div class="mini-label">Select ID type</div>
+        <div class="segmented">${def.choice.map(c=>`<button class="seg ${st.choice===c?'on':''}" onclick="setDocChoice('${prefix}','${k}','${c}',this)">${c}</button>`).join('')}</div></div>` : '';
+    const fieldsHtml = def.fields.map(f=>`
+      <div class="field-group"><div class="mini-label">${f.label}</div>
+        <input class="field sm" ${f.type==='date'?'type="date"':''} value="${st[f.k]||''}" ${f.type==='date'?'':`placeholder="Enter ${f.label.toLowerCase()}"`} onchange="setDoc('${prefix}','${k}','${f.k}',this.value)"></div>`).join('');
+    const uploadLabel = def.image ? 'Upload photo' : 'Upload document';
     return `
       <div class="doc-card">
         <div class="doc-top">
           <div class="doc-ico">${docIcon}</div>
-          <div><div class="doc-name">${def.name}</div><div class="doc-sub">${def.expiry?'Issue & expiry required':'No expiry'}</div></div>
+          <div><div class="doc-name">${def.name}</div><div class="doc-sub">${sub}</div></div>
           ${def.optional?'<span class="badge-opt">OPTIONAL</span>':''}
         </div>
-        <button class="upload-btn" id="up_${prefix}_${k}" onclick="mockUpload('${prefix}','${k}',this)">${upIcon} Upload document</button>
-        <div class="doc-fields" id="df_${prefix}_${k}">
-          <div class="field-group"><div class="mini-label">Document number</div><input class="field sm" placeholder="Enter number" onchange="setDoc('${prefix}','${k}','number',this.value)"></div>
-          <div class="row2">
-            <div style="flex:1;min-width:0;"><div class="mini-label">Issue date</div><input class="field sm" type="date" onchange="setDoc('${prefix}','${k}','issue',this.value)"></div>
-            ${expiryField}
-          </div>
-        </div>
+        <button class="upload-btn" id="up_${prefix}_${k}" onclick="mockUpload('${prefix}','${k}',this,${def.image?'true':'false'})">${upIcon} ${uploadLabel}</button>
+        <div class="doc-fields" id="df_${prefix}_${k}">${choiceHtml}${fieldsHtml}</div>
       </div>`;
   }
 
   /* doc state setters — prefix 'drv' = driver docs, 'v0'/'v1' = vehicle index */
   function docStore(prefix) {
     if (prefix === 'drv') return state.docs;
-    const idx = +prefix.slice(1);
-    return state.vehicles[idx].docs;
+    return state.vehicles[+prefix.slice(1)].docs;
   }
   function setDoc(prefix, k, field, val) { docStore(prefix)[k][field] = val; }
-  function mockUpload(prefix, k, btn) {
-    const store = docStore(prefix); store[k].uploaded = true;
+  function setDocChoice(prefix, k, c, el) {
+    docStore(prefix)[k].choice = c;
+    el.parentNode.querySelectorAll('.seg').forEach(s=>s.classList.remove('on'));
+    el.classList.add('on');
+  }
+  function mockUpload(prefix, k, btn, isImage) {
+    docStore(prefix)[k].uploaded = true;
     btn.classList.add('done');
-    btn.innerHTML = okIcon + ' Uploaded · sample.pdf';
+    btn.innerHTML = okIcon + ' Uploaded · ' + (isImage ? 'photo.jpg' : 'sample.pdf');
     document.getElementById('df_'+prefix+'_'+k).classList.add('show');
   }
+  function restoreDoc(prefix, def, st) {
+    if (st && st.uploaded) {
+      const b = document.getElementById('up_'+prefix+'_'+def.id);
+      if (b) { b.classList.add('done'); b.innerHTML = okIcon + ' Uploaded · ' + (def.image?'photo.jpg':'sample.pdf');
+        document.getElementById('df_'+prefix+'_'+def.id).classList.add('show'); }
+    }
+  }
 
-  /* ---- render driver docs (step 2) ---- */
+  /* ---- step 2: driver documents ---- */
   function renderDriverDocs() {
     document.getElementById('docList').innerHTML = DRIVER_DOCS.map(d => docCard(d, state.docs, 'drv')).join('');
+    DRIVER_DOCS.forEach(d => restoreDoc('drv', d, state.docs[d.id]));
+  }
+  function nextDriverDocs() {
+    const ok = DRIVER_DOCS_REQ.every(k => state.docs[k]?.uploaded);
+    showNote('noteDocs', !ok);
+    if (ok) showScreen('reg-vehicle');
   }
 
-  /* ---- vehicles (step 3) ---- */
-  const VEH_TYPES = ['BLS','ALS','ICU','Neonatal'];
+  /* ---- step 3: ambulance details (number + type only) ---- */
   function addVehicle() {
     if (state.vehicles.length >= 2) { document.getElementById('limitNote').classList.add('show'); return; }
-    state.vehicles.push({ number:'', type:'', docs:{} });
-    renderVehicles();
+    state.vehicles.push({ number:'', type:'', docs:{}, photos:{}, videos:{} });
+    renderVehicleDetails();
   }
-  function removeVehicle(i) { state.vehicles.splice(i,1); renderVehicles(); }
+  function removeVehicle(i) { state.vehicles.splice(i,1); renderVehicleDetails(); }
   function setVeh(i, field, val) { state.vehicles[i][field] = val; }
   function pickType(i, t, el) {
     el.parentNode.querySelectorAll('.seg').forEach(s=>s.classList.remove('on'));
     el.classList.add('on'); setVeh(i,'type',t);
   }
-  function renderVehicles() {
-    const list = document.getElementById('vehList');
-    list.innerHTML = state.vehicles.map((v,i) => `
+  function renderVehicleDetails() {
+    document.getElementById('vehList').innerHTML = state.vehicles.map((v,i) => `
       <div class="veh-card">
         <div class="veh-head">
           <div class="veh-title"><span class="dot">${i+1}</span> Ambulance ${i+1}</div>
@@ -1284,20 +1675,75 @@
           <div class="mini-label">Ambulance type</div>
           <div class="segmented">${VEH_TYPES.map(t=>`<button class="seg ${v.type===t?'on':''}" onclick="pickType(${i},'${t}',this)">${t}</button>`).join('')}</div>
         </div>
-        <div class="veh-docs-label">Vehicle documents</div>
-        ${VEHICLE_DOCS.map(d => docCard(d, v.docs, 'v'+i)).join('')}
       </div>`).join('');
-    // restore upload "done" visuals
-    state.vehicles.forEach((v,i)=>VEHICLE_DOCS.forEach(d=>{ if(v.docs[d.id]?.uploaded){ const b=document.getElementById('up_v'+i+'_'+d.id); if(b){b.classList.add('done');b.innerHTML=okIcon+' Uploaded · sample.pdf';document.getElementById('df_v'+i+'_'+d.id).classList.add('show');}}}));
-    // counter + button state
     const n = state.vehicles.length;
     document.getElementById('vehCounterText').textContent = `${n} of 2 vehicles added`;
-    const addBtn = document.getElementById('addVehBtn');
-    addBtn.disabled = n >= 2;
+    document.getElementById('addVehBtn').disabled = n >= 2;
     if (n < 2) document.getElementById('limitNote').classList.remove('show');
   }
+  function nextVehicleDetails() {
+    const ok = state.vehicles.length > 0 && state.vehicles.every(v => v.number && v.type);
+    showNote('noteVeh', !ok);
+    if (ok) showScreen('reg-vehicle-docs');
+  }
 
-  /* ---- save step 1 ---- */
+  /* ---- step 4: ambulance documents (calibration only for ALS/ICU) ---- */
+  function vehDocsFor(v) { return VEHICLE_DOCS.filter(d => !d.aclsOnly || isACLS(v.type)); }
+  function renderVehicleDocs() {
+    document.getElementById('vehDocList').innerHTML = state.vehicles.map((v,i) => `
+      <div class="veh-card">
+        <div class="veh-title" style="margin-bottom:12px;"><span class="dot">${i+1}</span> ${v.number||('Ambulance '+(i+1))}${v.type?(' · '+v.type):''}</div>
+        ${vehDocsFor(v).map(d => docCard(d, v.docs, 'v'+i)).join('')}
+      </div>`).join('');
+    state.vehicles.forEach((v,i) => vehDocsFor(v).forEach(d => restoreDoc('v'+i, d, v.docs[d.id])));
+  }
+  function nextVehicleDocs() {
+    const ok = state.vehicles.every(v => vehDocsFor(v).every(d => v.docs[d.id]?.uploaded));
+    showNote('noteVehDocs', !ok);
+    if (ok) showScreen('reg-photos');
+  }
+
+  /* ---- step 5: vehicle photos ---- */
+  function togglePhoto(i, si) { state.vehicles[i].photos[si] = true; renderPhotos(); }
+  function renderPhotos() {
+    document.getElementById('photoList').innerHTML = state.vehicles.map((v,i) => {
+      v.photos = v.photos || {};
+      return `<div class="veh-card">
+        <div class="veh-title" style="margin-bottom:10px;"><span class="dot">${i+1}</span> ${v.number||('Ambulance '+(i+1))}</div>
+        <div class="veh-docs-label">Vehicle photos</div>
+        <div class="photo-grid">${PHOTO_SLOTS.map((s,si)=>`
+          <div class="photo-tile ${v.photos[si]?'done':''}" onclick="togglePhoto(${i},${si})">
+            ${v.photos[si]?okIcon:camIcon}<div class="pt-label">${s}</div></div>`).join('')}</div>
+      </div>`;
+    }).join('');
+  }
+  function nextPhotos() {
+    const ok = state.vehicles.every(v => PHOTO_SLOTS.every((_,si) => v.photos && v.photos[si]));
+    showNote('notePhotos', !ok);
+    if (ok) showScreen(hasACLS() ? 'reg-videos' : 'reg-review');
+  }
+
+  /* ---- step 6: functional videos (ALS/ICU only) ---- */
+  function toggleVideo(i, si) { state.vehicles[i].videos[si] = true; renderVideos(); }
+  function renderVideos() {
+    const acls = state.vehicles.map((v,i)=>({v,i})).filter(o => isACLS(o.v.type));
+    document.getElementById('videoList').innerHTML = acls.length ? acls.map(({v,i}) => {
+      v.videos = v.videos || {};
+      return `<div class="veh-card">
+        <div class="veh-title" style="margin-bottom:10px;"><span class="dot">${i+1}</span> ${v.number||('Ambulance '+(i+1))} · ${v.type}</div>
+        <div class="veh-docs-label">Functional videos</div>
+        ${VIDEO_SLOTS.map((s,si)=>`<button class="upload-btn ${v.videos[si]?'done':''}" style="margin-bottom:8px;" onclick="toggleVideo(${i},${si})">${v.videos[si]?okIcon+' Uploaded · clip.mp4':vidIcon+' '+s}</button>`).join('')}
+      </div>`;
+    }).join('') : '<div class="doc-sub" style="text-align:center;padding:24px;">No ALS / ICU ambulances — no videos required.</div>';
+  }
+  function nextVideos() {
+    const ok = state.vehicles.filter(v=>isACLS(v.type)).every(v => VIDEO_SLOTS.every((_,si) => v.videos && v.videos[si]));
+    showNote('noteVideos', !ok);
+    if (ok) goReview();
+  }
+
+  /* ---- helpers ---- */
+  function showNote(id, show) { const n = document.getElementById(id); if (n) n.classList.toggle('show', show); }
   function pickSeg(el, field, val) {
     el.parentNode.querySelectorAll('.seg').forEach(s=>s.classList.remove('on'));
     el.classList.add('on'); state.personal[field] = val;
@@ -1310,13 +1756,13 @@
     showScreen('reg-docs');
   }
 
-  /* ---- review (step 4) ---- */
+  /* ---- review + submit ---- */
   function setPrimary(i) { state.primary = i; renderReview(); }
   function goReview() { renderReview(); showScreen('reg-review'); }
+  function backFromReview() { showScreen(hasACLS() ? 'reg-videos' : 'reg-photos'); }
   function renderReview() {
     const p = state.personal;
     const row = (k,v)=>`<div class="sum-row"><span class="k">${k}</span><span class="v">${v||'—'}</span></div>`;
-    const docCount = DRIVER_DOCS.filter(d=>state.docs[d.id]?.uploaded).length;
     let html = `
       <div class="sum-card">
         <div class="sum-top"><div class="sum-check">${okIcon}</div><div class="sum-title">Personal Details</div><span class="sum-edit" onclick="showScreen('registration')">Edit</span></div>
@@ -1324,12 +1770,22 @@
       </div>
       <div class="sum-card">
         <div class="sum-top"><div class="sum-check">${okIcon}</div><div class="sum-title">Driver Documents</div><span class="sum-edit" onclick="showScreen('reg-docs')">Edit</span></div>
-        ${DRIVER_DOCS.map(d=>row(d.name, state.docs[d.id]?.uploaded?'Uploaded':(d.optional?'Skipped':'Pending'))).join('')}
-      </div>
-      <div class="sum-card">
-        <div class="sum-top"><div class="sum-check">${okIcon}</div><div class="sum-title">Ambulance(s) · ${state.vehicles.length}</div><span class="sum-edit" onclick="showScreen('reg-vehicle')">Edit</span></div>
-        ${state.vehicles.map((v,i)=>row('Ambulance '+(i+1), (v.number||'—')+(v.type?(' · '+v.type):''))).join('') || row('Ambulances','None added')}
+        ${DRIVER_DOCS.map(d=>row(d.name + (d.id==='idproof'&&state.docs.idproof?.choice?` (${state.docs.idproof.choice})`:''), state.docs[d.id]?.uploaded?'Uploaded':(d.optional?'Skipped':'Pending'))).join('')}
       </div>`;
+    state.vehicles.forEach((v,i)=>{
+      const acls = isACLS(v.type);
+      const docsTotal = vehDocsFor(v).length;
+      const docsUp = vehDocsFor(v).filter(d=>v.docs[d.id]?.uploaded).length;
+      const photos = Object.keys(v.photos||{}).length;
+      const vids = Object.keys(v.videos||{}).length;
+      html += `<div class="sum-card">
+        <div class="sum-top"><div class="sum-check">${okIcon}</div><div class="sum-title">Ambulance ${i+1}</div><span class="sum-edit" onclick="showScreen('reg-vehicle')">Edit</span></div>
+        ${row('Vehicle number', v.number)}${row('Type', v.type)}
+        ${row('Documents', docsUp+' / '+docsTotal+' uploaded')}
+        ${row('Photos', photos+' / '+PHOTO_SLOTS.length)}
+        ${acls?row('Videos', vids+' / '+VIDEO_SLOTS.length):''}
+      </div>`;
+    });
     if (state.vehicles.length === 2) {
       html += `<div class="sum-card"><div class="sum-title" style="margin-bottom:4px;">Primary ambulance</div>
         <div class="doc-sub" style="margin-bottom:10px;">Choose which vehicle is active after approval.</div>
@@ -1345,20 +1801,22 @@
   /* ---- carry mobile number Login -> OTP/registration, run per-screen setup ---- */
   const origShow = showScreen;
   showScreen = function(id) {
-    if (id === 'otp' || id === 'registration') {
-      const raw = (document.querySelector('#login .num').value || '').trim();
-      state.mobile = raw ? '+91 ' + raw.replace(/(\d{5})(\d{1,5})/, '$1 $2') : '+91 00000 00000';
-    }
     if (id === 'otp') document.getElementById('otpNumber').textContent = state.mobile;
     if (id === 'registration') document.getElementById('r_mobile').value = state.mobile;
     if (id === 'reg-docs')    renderDriverDocs();
-    if (id === 'reg-vehicle') { if (state.vehicles.length === 0) addVehicle(); else renderVehicles(); }
-    if (id === 'ambulance-select') renderAmbSelect();
+    if (id === 'reg-vehicle') { if (state.vehicles.length === 0) addVehicle(); else renderVehicleDetails(); }
+    if (id === 'reg-vehicle-docs') renderVehicleDocs();
+    if (id === 'reg-photos')  renderPhotos();
+    if (id === 'reg-videos')  renderVideos();
+    if (id === 'dashboard') document.getElementById('dashSheet')?.classList.remove('expanded');
+    if (id === 'waiting') document.getElementById('waitSheet')?.classList.remove('expanded');
+    if (id === 'ambulance-select') { if (prototypeState.driverScenario === 'agencyDriver') activeAmb = -1; showNote('noteAmb', false); renderAmbSelect(); }
     if (id === 'vehicles')    renderVehiclesApp();
     if (id === 'documents')   renderDocuments();
     origShow(id);
     if (id === 'otp') { resetOtpCells(); startOtpTimer(); setTimeout(()=>document.querySelector('.otp-cell')?.focus(), 60); }
     if (id === 'ride-request') startRideCountdown();
+    if (id === 'agency-detected') setTimeout(()=>{ if (prototypeState.currentScreen === 'agency-detected') navigateTo('ambulance-select'); }, 1500);
     if (typeof updateDemoActive === 'function') updateDemoActive();
   };
 
@@ -1399,6 +1857,12 @@
     { num:'KA01AB1234', type:'ALS', status:'verified', model:'Force Traveller' },
     { num:'KA05CD5678', type:'BLS', status:'verified', model:'Maruti Eeco' },
   ];
+  // agency-assigned fleet (shown only for agency drivers)
+  const AGENCY_AMBS = [
+    { num:'KA01AB1234', type:'ALS' },
+    { num:'RJ14XX5678', type:'BLS' },
+    { num:'MH12XX9012', type:'ICU' },
+  ];
   let activeAmb = 0;
 
   const DOC_STATE = [
@@ -1420,19 +1884,26 @@
   /* ============ DEMO CONTROL PANEL ============ */
   const DEMO = [
     { sec:'Authentication', items:[
-      ['Splash','splash'], ['Login','login'], ['OTP','otp'], ['Register','registration'],
+      ['Splash','splash'], ['Login','login'], ['Mobile Verification','mobile-verify'],
+      ['OTP','otp'], ['Register','registration'],
     ]},
-    { sec:'Driver Types → verify OTP', items:[
-      ['Agency Driver','otp',{type:'agency',count:2}],
-      ['Approved · 1 Ambulance','otp',{type:'approved',count:1}],
-      ['Approved · 2 Ambulances','otp',{type:'approved',count:2}],
-      ['Pending Verification','otp',{type:'pending'}],
-      ['Correction Required','otp',{type:'correction'}],
-      ['New Individual Driver','otp',{type:'new'}],
+    { sec:'Scenario → start at Login', items:[
+      ['New Individual Driver','login',{type:'newIndividual'}],
+      ['Agency Driver','login',{type:'agencyDriver',count:2}],
+      ['Approved Individual Driver','login',{type:'approvedIndividual',count:2}],
+      ['Approved · 1 Ambulance','login',{type:'approvedIndividual',count:1}],
+      ['Pending Verification','login',{type:'pendingVerification'}],
+      ['Correction Required','login',{type:'correctionRequired'}],
+    ]},
+    { sec:'Registration Steps', items:[
+      ['1 · Personal','registration'], ['2 · Driver Docs','reg-docs'],
+      ['3 · Ambulance Details','reg-vehicle'], ['4 · Ambulance Docs','reg-vehicle-docs'],
+      ['5 · Vehicle Photos','reg-photos'], ['6 · Functional Videos','reg-videos'],
+      ['Review & Submit','reg-review'],
     ]},
     { sec:'Registration States', items:[
       ['Pending Verification','pending'], ['Correction Required','correction'],
-      ['Registration Approved','approved'],
+      ['Registration Approved','approved'], ['Account Not Found','account-not-found'],
     ]},
     { sec:'Driver Entry', items:[
       ['Ambulance Selection','ambulance-select'], ['Driver Dashboard','dashboard'],
@@ -1453,15 +1924,34 @@
   /* ============ APP RENDER FUNCTIONS ============ */
   const ambIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17h6M5 17H3v-6l2-5h11l4 5v6h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M11 8v4M9 10h4"/></svg>`;
 
+  function ambList() { return prototypeState.driverScenario === 'agencyDriver' ? AGENCY_AMBS : AMBS; }
   function renderAmbSelect() {
-    document.getElementById('ambList').innerHTML = AMBS.map((a,i) => `
+    const agency = prototypeState.driverScenario === 'agencyDriver';
+    const list = ambList();
+    const sub = document.getElementById('ambSelectSub');
+    if (sub) sub.textContent = agency ? 'Ambulances assigned by your agency' : "Choose the vehicle you'll drive today";
+    document.getElementById('ambList').innerHTML = list.map((a,i) => `
       <div class="amb-opt ${activeAmb===i?'on':''}" onclick="pickAmb(${i})">
         <div class="amb-ico">${ambIcon}</div>
-        <div><div class="amb-num">${a.num}</div><div class="amb-meta">${a.type} · ${a.model}</div></div>
+        <div style="flex:1;min-width:0;">
+          <div class="amb-num">${a.type} Ambulance</div>
+          <div class="amb-meta">${a.num}${a.model?(' · '+a.model):''}</div>
+          ${agency?'<span class="badge b-verified" style="margin-top:6px;"><span class="dotmark"></span>Assigned by Agency</span>':''}
+        </div>
         <div class="radio"></div>
       </div>`).join('');
   }
-  function pickAmb(i){ activeAmb=i; renderAmbSelect(); const d=document.getElementById('dashAmb'); if(d) d.textContent=`${AMBS[i].num} · ${AMBS[i].type}`; }
+  function pickAmb(i){
+    activeAmb = i;
+    showNote('noteAmb', false);
+    renderAmbSelect();
+    const a = ambList()[i];
+    const d = document.getElementById('dashAmb'); if (d) d.textContent = `${a.num} · ${a.type}`;
+  }
+  function confirmAmbSelect(){
+    if (activeAmb < 0) { showNote('noteAmb', true); return; }
+    navigateTo('dashboard');
+  }
 
   function renderVehiclesApp() {
     document.getElementById('vehAppList').innerHTML = AMBS.map((a,i) => `
@@ -1491,34 +1981,52 @@
   }
 
   function toggleOnline(){ showScreen('waiting'); }
+  function toggleDashSheet(){ document.getElementById('dashSheet').classList.toggle('expanded'); }
+  function toggleSheet(el){ el.closest('.dash-sheet').classList.toggle('expanded'); }
 
-  /* ---- driver-type state + OTP routing ---- */
-  function setDriver(type, count){
-    state.driverType = type;
-    if (count) state.vehCount = count;
-    showScreen('otp');           // land on OTP so reviewer can verify into the right flow
+  /* ---- demo scenario selection: set scenario, then start at login ---- */
+  function setDriver(scenario, count){
+    prototypeState.driverScenario = scenario;
+    if (count) vehCount = count;
+    navigateTo('login'); // pick scenario -> login -> OTP -> handleOtpVerified routes
   }
-  function verifyOtp(){
-    switch (state.driverType) {
-      case 'agency':
-        // agency: pick assigned ambulance if more than one, else straight to dashboard
-        showScreen(state.vehCount > 1 ? 'ambulance-select' : 'dashboard');
+
+  /* ---- enter OTP from login or individual-registration flow ---- */
+  function startOtp(context){
+    prototypeState.otpContext = context; // 'login' | 'registration'
+    const sel = context === 'registration' ? '#mobile-verify .num' : '#login .num';
+    const raw = (document.querySelector(sel).value || '').trim();
+    state.mobile = raw ? '+91 ' + raw.replace(/(\d{5})(\d{1,5})/, '$1 $2') : '+91 00000 00000';
+    if (context === 'registration') prototypeState.driverScenario = 'newIndividual';
+    navigateTo('otp');
+  }
+
+  /* ---- OTP routing: registration always -> personal details; login -> scenario ---- */
+  function handleOtpVerified(){
+    if (prototypeState.otpContext === 'registration') { navigateTo('registerPersonalDetails'); return; }
+    handleLoginOtpVerified();
+  }
+  function handleLoginOtpVerified(){
+    switch (prototypeState.driverScenario) {
+      case "agencyDriver":
+        navigateTo("agency-detected"); // detected -> select today's ambulance -> dashboard
         break;
-      case 'approved':
-        // approved individual: select only when 2 ambulances exist
-        showScreen(state.vehCount > 1 ? 'ambulance-select' : 'dashboard');
+      case "approvedIndividual":
+        navigateTo(vehCount > 1 ? "ambulanceSelection" : "dashboard");
         break;
-      case 'pending':
-        showScreen('pending');
+      case "pendingVerification":
+        navigateTo("pendingVerification");
         break;
-      case 'correction':
-        showScreen('correction');
+      case "correctionRequired":
+        navigateTo("correctionRequired");
         break;
-      case 'new':
+      case "newIndividual":
       default:
-        showScreen('registration');   // unregistered number -> register flow
+        navigateTo("account-not-found"); // unregistered number on login flow
+        break;
     }
   }
+  const verifyOtp = handleOtpVerified; // back-compat alias
 
   /* ride-request countdown */
   let rideCdInt=null;
@@ -1534,17 +2042,20 @@
         const exists = !!document.getElementById(id);
         const onclick = opts
           ? `setDriver('${opts.type}'${opts.count?(','+opts.count):''})`
-          : `showScreen('${id}')`;
+          : `navigateTo('${id}')`;
         return `<button class="demo-btn" data-id="${opts?'':id}" onclick="${onclick}">
           <span>${label}</span>${exists?'':'<span class="soon">SOON</span>'}</button>`;
       }).join('')
     ).join('');
-    updateDemoActive();
+    updateDemoPanelActiveState();
   }
-  function updateDemoActive() {
+  function updateDemoPanelActiveState() {
     document.querySelectorAll('.demo-btn').forEach(b =>
       b.classList.toggle('active', b.dataset.id === currentScreen));
+    const badge = document.getElementById('scenarioBadge');
+    if (badge) badge.textContent = prototypeState.driverScenario;
   }
+  const updateDemoActive = updateDemoPanelActiveState; // alias used by showScreen router
   renderDemo();
 
   // boot on splash, auto-advance to login
