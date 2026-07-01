@@ -274,6 +274,26 @@
   .veh-remove { font-size: 12.5px; font-weight: 700; color: #D14343; cursor: pointer; }
   .veh-docs-label { font-size: 11.5px; font-weight: 700; color: var(--ink-500); letter-spacing: .04em; text-transform: uppercase; margin: 4px 0 10px; }
 
+  /* ============ ACCORDION: AMBULANCE DOC SECTIONS ============ */
+  .acc-card { border: 1.5px solid var(--line); border-radius: var(--radius-card); margin-bottom: 12px; overflow: hidden; background: var(--white); transition: border-color .2s; }
+  .acc-card.open { border-color: var(--purple-200, #C9B6F5); }
+  .acc-head { display: flex; align-items: center; gap: 11px; padding: 13px 15px; cursor: pointer; user-select: none; }
+  .acc-head .dot { width: 30px; height: 30px; border-radius: 9px; background: var(--purple-500); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .acc-main { min-width: 0; flex: 1; }
+  .acc-name { font-size: 15px; font-weight: 700; color: var(--ink-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .acc-meta { display: flex; align-items: center; gap: 9px; margin-top: 5px; }
+  .acc-type-txt { font-size: 11.5px; font-weight: 600; color: var(--ink-500); flex-shrink: 0; }
+  .acc-prog { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+  .mini-bar { flex: 1; height: 4px; min-width: 34px; border-radius: 99px; background: var(--line); overflow: hidden; }
+  .mini-bar i { display: block; height: 100%; border-radius: 99px; background: var(--purple-500); transition: width .3s ease; }
+  .mini-bar i.full { background: #1F9D4D; }
+  .acc-prog-txt { font-size: 10.5px; font-weight: 600; color: var(--ink-500); white-space: nowrap; flex-shrink: 0; }
+  .acc-chev { flex-shrink: 0; color: var(--ink-300); transition: transform .3s ease; }
+  .acc-chev svg { width: 20px; height: 20px; display: block; }
+  .acc-card.open .acc-chev { transform: rotate(180deg); }
+  .acc-body { max-height: 0; overflow: hidden; transition: max-height .32s ease; }
+  .acc-body-inner { padding: 2px 15px 15px; }
+
   .counter-pill { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; color: var(--purple-700); background: var(--purple-50); border: 1px solid var(--purple-100); padding: 8px 12px; border-radius: 11px; margin-bottom: 12px; }
   .counter-pill svg { width: 15px; height: 15px; }
   .add-veh { width: 100%; height: 48px; border-radius: 12px; border: 1.6px dashed #CFC7E0; background: var(--white); color: var(--purple-600); font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -391,6 +411,221 @@
   .photo-tile svg { width: 19px; height: 19px; }
   .photo-tile.done { border-style: solid; border-color: #BBE5C4; background: #EEF9F0; color: #1F9D4D; }
   .photo-tile .pt-label { line-height: 1.2; }
+
+  /* ---- upload states (photos + videos) ---- */
+  .up-list { display: flex; flex-direction: column; gap: 9px; }
+  .up-tile { border: 1.6px dashed #CFC7E0; background: var(--purple-50); border-radius: 12px; overflow: hidden; transition: border-color .15s, background .15s; }
+  .up-tile.done, .up-tile.failed { border-style: solid; }
+  .up-tile.done { border-color: #BBE5C4; background: #EEF9F0; }
+  .up-tile.failed { border-color: #F5C6C2; background: #FDEDEC; }
+  .up-body { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 92px; padding: 10px 8px; text-align: center; }
+  .up-empty { cursor: pointer; color: var(--purple-600); }
+  .up-empty svg { width: 20px; height: 20px; }
+  .up-label { font-size: 10.5px; font-weight: 600; line-height: 1.25; color: inherit; }
+  .up-empty .up-label { color: var(--ink-500); }
+  .up-cta { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: var(--purple-600); }
+  .up-cta svg { width: 13px; height: 13px; }
+  .up-uploading { color: var(--purple-600); }
+  .up-spin { width: 20px; height: 20px; border: 2.5px solid var(--purple-100); border-top-color: var(--purple-500); border-radius: 50%; animation: upspin .7s linear infinite; }
+  @keyframes upspin { to { transform: rotate(360deg); } }
+  .up-bar { width: 76%; height: 4px; border-radius: 99px; background: var(--purple-100); overflow: hidden; }
+  .up-bar i { display: block; height: 100%; width: 40%; border-radius: 99px; background: var(--purple-500); animation: upbar 1.05s ease-in-out infinite; }
+  @keyframes upbar { 0% { margin-left: -40%; } 100% { margin-left: 100%; } }
+  .up-done { gap: 8px; }
+  .up-thumb { position: relative; width: 100%; max-width: 128px; aspect-ratio: 16 / 10; border-radius: 9px; overflow: hidden; background: rgba(0,0,0,.06); }
+  .up-thumb img, .up-thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .up-badge { position: absolute; right: 5px; bottom: 5px; width: 20px; height: 20px; border-radius: 50%; background: #1F9D4D; color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .up-badge svg { width: 12px; height: 12px; }
+  .up-meta { display: flex; flex-direction: column; gap: 1px; }
+  .up-label.ok { color: #1F9D4D; font-weight: 700; }
+  .up-status { font-size: 10px; font-weight: 700; color: #1F9D4D; letter-spacing: .03em; }
+  .up-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  .up-actions button { font-size: 11px; font-weight: 700; color: var(--purple-600); background: var(--white); border: 1px solid var(--purple-100); border-radius: 8px; padding: 5px 9px; cursor: pointer; }
+  .up-actions button.danger { color: #D14343; border-color: #F5C6C2; }
+  .up-failed { gap: 8px; }
+  .up-err-in { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #C0392B; }
+  .up-err-in svg { width: 15px; height: 15px; }
+  .up-retry { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; color: #fff; background: var(--purple-500); border: none; border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+  .up-retry svg { width: 13px; height: 13px; }
+  .up-error { display: flex; align-items: flex-start; gap: 6px; font-size: 10.5px; font-weight: 600; color: #C0392B; background: #FDEDEC; border-top: 1px solid #F5C6C2; padding: 7px 9px; text-align: left; line-height: 1.3; }
+  .up-error svg { width: 13px; height: 13px; flex-shrink: 0; margin-top: 1px; }
+  /* video tiles: full-width row layout */
+  .up-tile.vid .up-body { flex-direction: row; justify-content: flex-start; text-align: left; gap: 12px; min-height: 64px; }
+  .up-tile.vid .up-empty .up-cta { margin-left: auto; }
+  .up-tile.vid .up-uploading .up-bar { flex: 1; width: auto; }
+  .up-tile.vid .up-done .up-thumb { width: 128px; flex-shrink: 0; }
+  .up-tile.vid .up-done .up-meta { margin-right: auto; }
+  .up-tile.vid .up-failed { justify-content: space-between; }
+  .up-tile.vid .up-failed .up-retry { margin-left: auto; }
+
+  /* ---- compact vehicle-photo upload items ---- */
+  .pu-card { padding: 12px; margin-bottom: 9px; }
+  .pu-card .veh-title { margin-bottom: 8px !important; }
+  .pu-card .veh-docs-label { margin: 2px 0 8px; }
+  .pu-list { display: flex; flex-direction: column; gap: 7px; }
+  .pu-item { display: flex; align-items: center; gap: 10px; border: 1.5px solid var(--line); border-radius: 11px; padding: 7px 9px; background: var(--white); }
+  .pu-item.done { border-color: #BBE5C4; background: #F5FCF7; }
+  .pu-item.failed { border-color: #F5C6C2; background: #FDEDEC; }
+  .pu-thumb { position: relative; width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--purple-50); color: var(--purple-600); }
+  .pu-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pu-thumb svg { width: 17px; height: 17px; }
+  .pu-thumb.err { background: #FDEDEC; color: #C0392B; }
+  .pu-tick { position: absolute; right: -3px; bottom: -3px; width: 16px; height: 16px; border-radius: 50%; background: #1F9D4D; color: #fff; border: 2px solid var(--white); display: flex; align-items: center; justify-content: center; }
+  .pu-tick svg { width: 9px; height: 9px; }
+  .pu-spin { width: 18px; height: 18px; border: 2.4px solid var(--purple-100); border-top-color: var(--purple-500); border-radius: 50%; animation: upspin .7s linear infinite; }
+  .pu-main { flex: 1; min-width: 0; }
+  .pu-name { font-size: 12.5px; font-weight: 700; color: var(--ink-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pu-status { display: flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 600; color: var(--ink-300); margin-top: 1px; }
+  .pu-status svg { width: 12px; height: 12px; }
+  .pu-status.ok { color: #1F9D4D; }
+  .pu-status.err { color: #C0392B; }
+  .pu-act { flex-shrink: 0; display: flex; align-items: center; gap: 3px; }
+  .pu-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; color: var(--purple-600); background: var(--purple-50); border: 1px solid var(--purple-100); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+  .pu-btn svg { width: 13px; height: 13px; }
+  .pu-btn.retry { color: #fff; background: var(--purple-500); border-color: var(--purple-500); }
+  .pu-menu { position: relative; }
+  .pu-kebab { width: 30px; height: 30px; border-radius: 8px; border: none; background: none; color: var(--ink-500); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .pu-kebab svg { width: 17px; height: 17px; }
+  .pu-kebab:active { background: var(--line); }
+  .pu-pop { position: absolute; right: 0; top: calc(100% + 4px); min-width: 132px; background: var(--white); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 22px rgba(0,0,0,.12); padding: 4px; z-index: 20; display: none; }
+  .pu-menu.open .pu-pop { display: block; }
+  .pu-pop button { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; font-size: 12.5px; font-weight: 600; color: var(--ink-900); background: none; border: none; border-radius: 7px; padding: 8px 10px; cursor: pointer; }
+  .pu-pop button svg { width: 14px; height: 14px; }
+  .pu-pop button:active { background: var(--purple-50); }
+  .pu-pop button.danger { color: #D14343; }
+  .pu-error { font-size: 10.5px; font-weight: 600; color: #C0392B; line-height: 1.3; margin: 4px 2px 0; }
+
+  /* ---- compact document cards (driver + ambulance) — always white ---- */
+  .doc-card { padding: 10px 11px; margin-bottom: 8px; }
+  .doc-row { display: flex; align-items: center; gap: 11px; }
+  .doc-card.done .doc-row { cursor: pointer; }
+  .doc-card .doc-ico { width: 32px; height: 32px; border-radius: 9px; margin: 0; flex-shrink: 0; }
+  .doc-card .doc-ico svg { width: 16px; height: 16px; }
+  .doc-main { flex: 1; min-width: 0; }
+  .doc-card .doc-name { font-size: 13px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .doc-card .doc-sub { margin: 1px 0 0; }
+  .doc-status { display: flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 700; color: #1F9D4D; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .doc-status svg { width: 12px; height: 12px; flex-shrink: 0; }
+  .doc-file { font-weight: 600; color: var(--ink-500); }
+  .doc-meta { font-size: 10.5px; font-weight: 600; color: var(--ink-300); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .doc-more { flex-shrink: 0; width: 30px; height: 30px; border: none; background: none; color: var(--ink-300); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .doc-more svg { width: 18px; height: 18px; }
+  .doc-more:active { background: var(--line); }
+  .doc-edit { margin-top: 10px; padding-top: 11px; border-top: 1px solid var(--line); }
+  .pu-btn.save { width: 100%; justify-content: center; color: #fff; background: var(--purple-500); border-color: var(--purple-500); margin-top: 4px; padding: 9px; font-size: 13px; }
+  /* progress header (driver docs) */
+  .doc-prog { display: flex; align-items: center; gap: 9px; margin: 0 2px 12px; }
+
+  /* ---- bottom sheet (Drive/Uber-style actions) ---- */
+  .sheet-wrap { position: absolute; inset: 0; z-index: 60; display: flex; align-items: flex-end; background: rgba(20,16,40,.42); opacity: 0; pointer-events: none; transition: opacity .22s ease; }
+  .sheet-wrap.open { opacity: 1; pointer-events: auto; }
+  .sheet { width: 100%; background: var(--white); border-radius: 20px 20px 0 0; padding: 8px 10px 16px; transform: translateY(100%); transition: transform .26s cubic-bezier(.22,.61,.36,1); box-shadow: 0 -8px 30px rgba(0,0,0,.16); }
+  .sheet-wrap.open .sheet { transform: translateY(0); }
+  .sheet-grip { width: 38px; height: 4px; border-radius: 99px; background: var(--line); margin: 4px auto 10px; }
+  .sheet-title { font-size: 12.5px; font-weight: 700; color: var(--ink-500); padding: 0 12px 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sheet-actions { display: flex; flex-direction: column; }
+  .sheet-btn { display: flex; align-items: center; gap: 13px; width: 100%; text-align: left; font-size: 14px; font-weight: 600; color: var(--ink-900); background: none; border: none; border-radius: 12px; padding: 13px 12px; cursor: pointer; }
+  .sheet-btn svg { width: 19px; height: 19px; color: var(--ink-500); flex-shrink: 0; }
+  .sheet-btn:active { background: var(--purple-50); }
+  .sheet-btn.danger { color: #D14343; }
+  .sheet-btn.danger svg { color: #D14343; }
+
+  /* ---- ride trip timer ---- */
+  .trip-timer { background: var(--purple-50); border: 1px solid var(--purple-100); border-radius: 14px; padding: 12px 14px; margin-top: 12px; }
+  .trip-timer .tt-l { display: flex; align-items: center; justify-content: space-between; }
+  .tt-label { font-size: 12px; font-weight: 700; color: var(--purple-700); }
+  .tt-time { font-size: 23px; font-weight: 800; color: var(--ink-900); font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+  .tt-stats { display: flex; gap: 9px; margin-top: 10px; }
+  .tt-stat { flex: 1; background: var(--white); border-radius: 10px; padding: 8px 10px; }
+  .tt-k { font-size: 10.5px; color: var(--ink-500); font-weight: 600; }
+  .tt-v { font-size: 14px; font-weight: 700; color: var(--ink-900); margin-top: 2px; }
+
+  /* ---- earnings: range, charts, history, export ---- */
+  .seg-range { display: flex; gap: 6px; background: var(--purple-50); border: 1px solid var(--purple-100); border-radius: 12px; padding: 4px; margin-bottom: 12px; }
+  .seg-range button { flex: 1; border: none; background: none; border-radius: 9px; padding: 8px 4px; font-size: 12.5px; font-weight: 700; color: var(--ink-500); cursor: pointer; }
+  .seg-range button.on { background: var(--white); color: var(--purple-700); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .range-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .rr-field { flex: 1; }
+  .rr-field label { display: block; font-size: 10px; font-weight: 600; color: var(--ink-500); margin-bottom: 3px; }
+  .range-row .arrow { color: var(--ink-300); margin-top: 15px; font-size: 13px; }
+  .rev-daily { display: flex; align-items: center; gap: 12px; }
+  .rd-ico { width: 42px; height: 42px; border-radius: 12px; background: var(--purple-50); color: var(--purple-600); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .rd-ico svg { width: 20px; height: 20px; }
+  .rd-amt { font-size: 22px; font-weight: 800; color: var(--ink-900); }
+  .bars { display: flex; align-items: flex-end; gap: 6px; height: 82px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 5px; height: 100%; }
+  .bar-track { width: 100%; flex: 1; display: flex; align-items: flex-end; justify-content: center; }
+  .bar-fill { width: 100%; max-width: 20px; min-height: 3px; border-radius: 6px 6px 0 0; background: linear-gradient(180deg,#B79CE8,var(--purple-600)); transition: height .3s ease; }
+  .bar-today .bar-fill { background: linear-gradient(180deg,#34C759,#1F9D4D); }
+  .bar-lbl { font-size: 9px; font-weight: 700; color: var(--ink-300); }
+  .filters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .filters .full { grid-column: 1 / -1; }
+  select.field { -webkit-appearance: none; appearance: none; background: var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a7391' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 11px center; padding-right: 30px; }
+  .exp-btns { display: flex; gap: 9px; }
+  .exp-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px; padding: 11px; border-radius: 11px; border: 1.5px solid var(--purple-100); background: var(--white); color: var(--purple-700); font-size: 13px; font-weight: 700; cursor: pointer; }
+  .exp-btn svg { width: 15px; height: 15px; }
+  .exp-btn:active { background: var(--purple-50); }
+  .ride-item { border: 1px solid var(--line); border-radius: 11px; padding: 9px 11px; margin-bottom: 7px; }
+  .ri-top { display: flex; align-items: center; justify-content: space-between; }
+  .ri-id { font-size: 12px; font-weight: 800; color: var(--purple-700); letter-spacing: .02em; }
+  .ri-fare { font-size: 15px; font-weight: 800; color: var(--ink-900); }
+  .ri-hosp { font-size: 13px; font-weight: 600; color: var(--ink-900); margin-top: 3px; }
+  .ri-bot { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-top: 6px; font-size: 11px; color: var(--ink-500); font-weight: 600; }
+  .ri-bot .sep { color: #d8d3e2; }
+  .chip { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--purple-50); color: var(--purple-700); border: 1px solid var(--purple-100); }
+  .chip.ok { background: #EEF9F0; color: #1F9D4D; border-color: #BBE5C4; }
+  .chip.cancel { background: #FDEDEC; color: #C0392B; border-color: #F5C6C2; }
+  .earn-empty { text-align: center; color: var(--ink-300); font-size: 13px; padding: 24px; }
+
+  /* ---- earnings compact refinements ---- */
+  .range-bar { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 11px; margin-bottom: 12px; }
+  .rb-text { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--ink-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rb-label { font-weight: 700; color: var(--ink-900); flex-shrink: 0; }
+  .rb-sep { color: #d8d3e2; }
+  .rb-change { flex-shrink: 0; font-size: 12.5px; font-weight: 700; color: var(--purple-600); background: none; border: none; cursor: pointer; padding: 2px 4px; }
+  .earn-hero { padding: 14px 16px !important; }
+  .eh-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .eh-total { font-size: 27px; font-weight: 800; letter-spacing: -0.02em; margin-top: 1px; }
+  .eh-today { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 1px; font-size: 10px; font-weight: 600; opacity: .92; background: rgba(255,255,255,.15); border-radius: 9px; padding: 5px 9px; }
+  .eh-today b { font-size: 13px; font-weight: 800; }
+  .eh-stats { display: flex; gap: 18px; margin-top: 12px; }
+  .eh-stats > div { display: flex; flex-direction: column; }
+  .eh-stats span { font-size: 11px; opacity: .8; }
+  .eh-stats b { font-size: 15px; font-weight: 700; margin-top: 1px; }
+  .card-tight { padding: 11px 13px; }
+  .hist-tools { display: flex; gap: 9px; margin-bottom: 10px; }
+  .tool-btn { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px; padding: 10px; border-radius: 11px; border: 1.5px solid var(--purple-100); background: var(--white); color: var(--purple-700); font-size: 13px; font-weight: 700; cursor: pointer; }
+  .tool-btn svg { width: 15px; height: 15px; }
+  .tool-btn:active { background: var(--purple-50); }
+  .tool-btn.active { border-color: #B79CE8; }
+  .tb-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--purple-600); }
+  .sheet-pad { padding: 2px 12px 8px; }
+  .filt-field { margin-bottom: 10px; }
+  .filt-field label { display: block; font-size: 11px; font-weight: 600; color: var(--ink-500); margin-bottom: 5px; }
+
+  /* ---- ambulance variant: service-class badge + type picker ---- */
+  .cls-badge { display: inline-flex; align-items: center; font-size: 9.5px; font-weight: 800; letter-spacing: .04em; padding: 2px 7px; border-radius: 99px; text-transform: uppercase; flex-shrink: 0; }
+  .cls-badge.ACLS { color: #C0392B; background: #FDEDEC; border: 1px solid #F5C6C2; }
+  .cls-badge.BLS { color: #1F6FB2; background: #EAF3FB; border: 1px solid #C4DDF2; }
+  .cls-badge.Specialty { color: #7A5AF8; background: #F1EDFE; border: 1px solid #DAD0FB; }
+  .type-select { width: 100%; display: flex; align-items: center; gap: 10px; text-align: left; background: var(--white); border: 1.5px solid var(--line); border-radius: 12px; padding: 11px 12px; cursor: pointer; }
+  .type-select:active { border-color: var(--purple-200, #C9B6F5); }
+  .type-select .ts-ph { flex: 1; font-size: 13.5px; font-weight: 600; color: var(--ink-300); }
+  .ts-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .ts-row { display: flex; align-items: center; gap: 8px; }
+  .ts-short { font-size: 11.5px; font-weight: 700; color: var(--purple-700); }
+  .ts-name { font-size: 12.5px; font-weight: 600; color: var(--ink-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ts-chev { flex-shrink: 0; color: var(--ink-300); }
+  .ts-chev svg { width: 20px; height: 20px; display: block; }
+  .vsheet-group { font-size: 10.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-300); padding: 12px 12px 5px; }
+  .vopt { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: none; border: none; border-radius: 10px; padding: 9px 12px; cursor: pointer; }
+  .vopt:active, .vopt.on { background: var(--purple-50); }
+  .vopt-main { flex: 1; min-width: 0; }
+  .vopt-name { font-size: 12.5px; font-weight: 600; color: var(--ink-900); line-height: 1.25; }
+  .vopt-short { font-size: 11px; font-weight: 600; color: var(--ink-500); margin-top: 1px; }
+  .vopt-check { flex-shrink: 0; color: var(--purple-600); opacity: 0; }
+  .vopt.on .vopt-check { opacity: 1; }
+  .vopt-check svg { width: 16px; height: 16px; }
 
   /* ============ REUSABLE: REVIEW SUMMARY ============ */
   .sum-card { border: 1.5px solid var(--line); border-radius: var(--radius-card); padding: 15px; margin-bottom: 11px; }
@@ -661,7 +896,7 @@
         </div>
 
         <div class="heading">
-          <h2>Welcome to<br>Medurun Driver</h2>
+          <h2>Driver Sign In</h2>
           <p>Sign in using your registered mobile number.</p>
         </div>
 
@@ -818,8 +1053,8 @@
         <div class="heading"><h2>Driver documents</h2><p>Upload your verification documents.</p></div>
       </div>
       <div class="scroll" style="padding-top:16px;">
-        <div id="docList"><!-- JS rendered --></div>
         <div class="val-note" id="noteDocs">Please upload all required documents before continuing.</div>
+        <div id="docList"><!-- JS rendered --></div>
       </div>
       <div class="actionbar"><button class="btn" onclick="nextDriverDocs()">Continue</button></div>
     </section>
@@ -869,8 +1104,8 @@
         <div class="heading"><h2>Ambulance documents</h2><p>Upload documents for each ambulance.</p></div>
       </div>
       <div class="scroll" style="padding-top:16px;">
-        <div id="vehDocList"><!-- JS rendered --></div>
         <div class="val-note" id="noteVehDocs">Please upload all required ambulance documents before continuing.</div>
+        <div id="vehDocList"><!-- JS rendered --></div>
       </div>
       <div class="actionbar"><button class="btn" onclick="nextVehicleDocs()">Continue</button></div>
     </section>
@@ -890,8 +1125,8 @@
         <div class="heading"><h2>Vehicle photos</h2><p>Capture each required angle.</p></div>
       </div>
       <div class="scroll" style="padding-top:16px;">
-        <div id="photoList"><!-- JS rendered --></div>
         <div class="val-note" id="notePhotos">Please upload all required vehicle photos before continuing.</div>
+        <div id="photoList"><!-- JS rendered --></div>
       </div>
       <div class="actionbar"><button class="btn" onclick="nextPhotos()">Continue</button></div>
     </section>
@@ -911,8 +1146,8 @@
         <div class="heading"><h2>Functional videos</h2><p>Required for ALS / ICU ambulances.</p></div>
       </div>
       <div class="scroll" style="padding-top:16px;">
-        <div id="videoList"><!-- JS rendered --></div>
         <div class="val-note" id="noteVideos">Please upload all required functional videos before continuing.</div>
+        <div id="videoList"><!-- JS rendered --></div>
       </div>
       <div class="actionbar"><button class="btn" onclick="nextVideos()">Continue</button></div>
     </section>
@@ -1028,7 +1263,7 @@
         <div class="card flat" style="margin-top:20px;">
           <div class="sum-row"><span class="k">Agency</span><span class="v">LifeLine Ambulance Services</span></div>
           <div class="sum-row"><span class="k">Driver</span><span class="v">Rahul Sharma</span></div>
-          <div class="sum-row"><span class="k">Assigned ambulance</span><span class="v">KA01AB1234 · ALS</span></div>
+          <div class="sum-row"><span class="k">Assigned ambulance</span><span class="v">KA01AB1234 · ALS Winger</span></div>
           <div class="sum-row"><span class="k">Status</span><span class="v"><span class="badge b-verified"><span class="dotmark"></span>Verified Agency Driver</span></span></div>
         </div>
 
@@ -1071,7 +1306,7 @@
       <div class="map-topbar">
         <div class="bar">
           <div class="avatar">RS</div>
-          <div class="info"><div class="n">Hi, Rahul</div><div class="v" id="dashAmb">KA01AB1234 · ALS</div></div>
+          <div class="info"><div class="n">Hi, Rahul</div><div class="v" id="dashAmb">KA01AB1234 · ALS Winger</div></div>
         </div>
         <div class="notif"><span class="nd"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
       </div>
@@ -1166,7 +1401,7 @@
       <div class="map-topbar">
         <div class="bar">
           <div class="avatar">RS</div>
-          <div class="info"><div class="n">Hi, Rahul</div><div class="v">KA01AB1234 · ALS</div></div>
+          <div class="info"><div class="n">Hi, Rahul</div><div class="v">KA01AB1234 · ALS Winger</div></div>
           <span class="badge b-online" style="margin-left:auto;"><span class="dotmark"></span>Online</span>
         </div>
         <div class="notif"><span class="nd"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
@@ -1330,7 +1565,7 @@
           <div class="rail"><span class="d e"></span></div>
           <div><div class="tl-main" style="padding-bottom:0;"><div class="tl-k">Destination</div><div class="tl-v">Apollo Hospital, Bannerghatta Rd · 8.1 km</div></div></div>
         </div>
-        <button class="btn" style="margin-top:14px;" onclick="showScreen('navigate-destination')">Start Trip to Destination</button>
+        <button class="btn" style="margin-top:14px;" onclick="startTripTimer()">Patient Picked Up</button>
       </div>
     </section>
 
@@ -1351,7 +1586,14 @@
           <div class="status-ico green" style="width:46px;height:46px;margin:0;box-shadow:none;"><svg viewBox="0 0 24 24" style="width:22px;height:22px;" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
           <div><div class="sh-t">En route to hospital</div><div class="sh-s">Apollo Hospital, Bannerghatta Rd</div></div>
         </div>
-        <button class="btn" style="margin-top:4px;" onclick="showScreen('trip-completed')">Complete Trip</button>
+        <div class="trip-timer">
+          <div class="tt-l"><div class="tt-label">Time since pickup</div><div class="tt-time" id="ttTime">00:00</div></div>
+          <div class="tt-stats">
+            <div class="tt-stat"><div class="tt-k">ETA to hospital</div><div class="tt-v">14 min</div></div>
+            <div class="tt-stat"><div class="tt-k">Distance remaining</div><div class="tt-v">8.1 km</div></div>
+          </div>
+        </div>
+        <button class="btn" style="margin-top:12px;" onclick="stopTripTimer();showScreen('trip-completed')">Complete Trip</button>
       </div>
     </section>
 
@@ -1380,29 +1622,13 @@
           <div style="flex:1;"><div style="font-size:13.5px;font-weight:650;color:var(--ink-900);">Added to today's earnings</div><div style="font-size:12px;color:var(--ink-500);">Paid via Medurun · Cash collected</div></div>
         </div>
       </div>
-      <div class="actionbar"><button class="btn" onclick="showScreen('waiting')">Back to Online</button></div>
+      <div class="actionbar"><button class="btn" onclick="showScreen('waiting')">Ready for Next Ride</button></div>
     </section>
 
     <!-- ============ EARNINGS ============ -->
     <section class="screen" id="earnings">
       <div class="app-top"><div><div class="ttl">Earnings</div><div class="sub">Your trips &amp; payouts</div></div></div>
-      <div class="app-body">
-        <div class="go-card" style="background:linear-gradient(150deg,var(--purple-500),var(--purple-700));">
-          <div class="gc-sub" style="opacity:.85;">This week</div>
-          <div style="font-size:32px;font-weight:800;letter-spacing:-0.02em;margin-top:2px;">₹8,420</div>
-          <div style="display:flex;gap:20px;margin-top:14px;">
-            <div><div style="font-size:12px;opacity:.8;">Trips</div><div style="font-size:16px;font-weight:700;">14</div></div>
-            <div><div style="font-size:12px;opacity:.8;">Online</div><div style="font-size:16px;font-weight:700;">36h</div></div>
-            <div><div style="font-size:12px;opacity:.8;">Avg / trip</div><div style="font-size:16px;font-weight:700;">₹601</div></div>
-          </div>
-        </div>
-        <div class="sec-title">Recent trips</div>
-        <div class="card">
-          <div class="list-row"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="lr-main"><div class="lr-t">Apollo Hospital</div><div class="lr-s">Today · 16 min · 8.1 km</div></div><div style="font-weight:800;color:var(--ink-900);font-size:14px;">₹700</div></div>
-          <div class="list-row"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="lr-main"><div class="lr-t">Fortis Hospital</div><div class="lr-s">Today · 22 min · 11.4 km</div></div><div style="font-weight:800;color:var(--ink-900);font-size:14px;">₹920</div></div>
-          <div class="list-row"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="lr-main"><div class="lr-t">Manipal Hospital</div><div class="lr-s">Yesterday · 18 min · 9.2 km</div></div><div style="font-weight:800;color:var(--ink-900);font-size:14px;">₹780</div></div>
-        </div>
-      </div>
+      <div class="app-body" id="earnBody"><!-- JS rendered --></div>
       <div class="tabbar">
         <div class="tab" onclick="showScreen('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Home</div>
         <div class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><circle cx="12" cy="12" r="3"/></svg>Earnings</div>
@@ -1500,6 +1726,15 @@
       </div>
     </section>
 
+    <!-- ============ ACTION BOTTOM SHEET ============ -->
+    <div id="sheet" class="sheet-wrap" onclick="closeSheet()">
+      <div class="sheet" onclick="event.stopPropagation()">
+        <div class="sheet-grip"></div>
+        <div class="sheet-title" id="sheetTitle"></div>
+        <div class="sheet-actions" id="sheetActions"></div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ============ DEMO CONTROL PANEL (prototype navigation only) ============ -->
@@ -1586,71 +1821,167 @@
     { id:'calibration', name:'Calibration Certificate', aclsOnly:true, fields:[{k:'expiry',label:'Expiry date',type:'date'}] },
   ];
 
-  const VEH_TYPES = ['BLS','ALS','ICU','Neonatal'];
+  /* ambulance variants → mapped to service class + short name */
+  const AMB_VARIANTS = [
+    // ACLS
+    { id:'als_winger',     type:'ALS (TATA Winger Ambulance)',                            short:'ALS Winger',     cls:'ACLS' },
+    { id:'als_tempo',      type:'ALS (Force Tempo Traveller Ambulance)',                  short:'ALS Tempo',      cls:'ACLS' },
+    { id:'als_bolero',     type:'ALS (Bolero Ambulance)',                                 short:'ALS Bolero',     cls:'ACLS' },
+    { id:'neo_als_winger', type:'Neonatal ALS (TATA Winger Ambulance)',                   short:'Neo ALS Winger', cls:'ACLS' },
+    { id:'neo_tempo',      type:'Neonatal (Force Tempo Traveller Ambulance)',             short:'Neo Tempo',      cls:'ACLS' },
+    // BLS
+    { id:'bls_winger',     type:'BLS (TATA Winger Ambulance)',                            short:'BLS Winger',     cls:'BLS' },
+    { id:'bls_tempo',      type:'BLS (Force Tempo Traveller Ambulance)',                  short:'BLS Tempo',      cls:'BLS' },
+    { id:'bls_bolero',     type:'BLS (Bolero Ambulance)',                                 short:'BLS Bolero',     cls:'BLS' },
+    { id:'bls_eeco',       type:'BLS (Eeco Ambulance)',                                   short:'BLS Eeco',       cls:'BLS' },
+    // Specialty
+    { id:'freezer',        type:'Freezer Box Mortuary Van (Force Tempo Traveller Ambulance)', short:'Freezer Van', cls:'Specialty' },
+    { id:'hearse',         type:'Hearse Van',                                             short:'Hearse',         cls:'Specialty' },
+  ];
+  const AMB_GROUPS = ['ACLS','BLS','Specialty'];
+  function variantById(id) { return AMB_VARIANTS.find(x => x.id === id); }
+
   const PHOTO_SLOTS = ['Front Side','Right Side','Left Side','Rear Side','Odometer','Interior with Lights & Fans','Stretcher','Attender Seat','Oxygen Chamber'];
   const VIDEO_SLOTS = ['Equipment in Switch-On Condition','Siren & Blinkers with Horn'];
-  const isACLS = t => t === 'ALS' || t === 'ICU';
-  const hasACLS = () => state.vehicles.some(v => isACLS(v.type));
+  const isACLS = v => !!v && v.serviceClass === 'ACLS';   // functional videos + calibration cert only for ACLS
+  const hasACLS = () => state.vehicles.some(v => isACLS(v));
 
   const docIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
   const upIcon  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`;
   const okIcon  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
   const camIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
   const vidIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>`;
+  const chevIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+  const warnIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+  const retryIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>`;
+  const kebabIcon = `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>`;
+  const eyeIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  const trashIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`;
+  const editIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+  const dlIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+  const calIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+  const filterIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>`;
 
-  /* build a flexible doc card */
+  /* ---- flexible doc card: empty | uploaded (collapsed) | edit mode ---- */
+  function docMeta(def, s) {
+    const bits = [];
+    if (s.choice) bits.push(s.choice);
+    const numF = def.fields.find(f => f.type !== 'date');
+    if (numF && s[numF.k]) bits.push(s[numF.k]);
+    if (s.expiry) bits.push('Exp: ' + s.expiry);
+    return bits.join(' · ');
+  }
   function docCard(def, store, prefix) {
     const k = def.id;
-    const st = store[k] = store[k] || { uploaded:false };
-    const sub = def.optional ? 'Optional' : (def.image ? 'Image upload' : 'Required');
-    const choiceHtml = def.choice ? `
-      <div class="field-group"><div class="mini-label">Select ID type</div>
-        <div class="segmented">${def.choice.map(c=>`<button class="seg ${st.choice===c?'on':''}" onclick="setDocChoice('${prefix}','${k}','${c}',this)">${c}</button>`).join('')}</div></div>` : '';
-    const fieldsHtml = def.fields.map(f=>`
-      <div class="field-group"><div class="mini-label">${f.label}</div>
-        <input class="field sm" ${f.type==='date'?'type="date"':''} value="${st[f.k]||''}" ${f.type==='date'?'':`placeholder="Enter ${f.label.toLowerCase()}"`} onchange="setDoc('${prefix}','${k}','${f.k}',this.value)"></div>`).join('');
-    const uploadLabel = def.image ? 'Upload photo' : 'Upload document';
-    return `
-      <div class="doc-card">
-        <div class="doc-top">
-          <div class="doc-ico">${docIcon}</div>
-          <div><div class="doc-name">${def.name}</div><div class="doc-sub">${sub}</div></div>
-          ${def.optional?'<span class="badge-opt">OPTIONAL</span>':''}
+    const s = store[k] = store[k] || { uploaded:false };
+    // --- empty state: only Upload + required label ---
+    if (!s.uploaded) {
+      const sub = def.optional ? 'Optional' : 'Required';
+      return `<div class="doc-card empty"><div class="doc-row">
+        <div class="doc-ico">${docIcon}</div>
+        <div class="doc-main"><div class="doc-name">${def.name}</div><div class="doc-sub">${sub}</div></div>
+        <button class="pu-btn" onclick="docPick('${prefix}','${k}')">${upIcon} Upload</button>
+      </div></div>`;
+    }
+    // --- uploaded state ---
+    const meta = docMeta(def, s);
+    const choiceHtml = def.choice ? `<div class="field-group"><div class="mini-label">Select ID type</div><div class="segmented">${def.choice.map(c=>`<button class="seg ${s.choice===c?'on':''}" onclick="setDocChoice('${prefix}','${k}','${c}',this)">${c}</button>`).join('')}</div></div>` : '';
+    const fieldsHtml = def.fields.map(f=>`<div class="field-group"><div class="mini-label">${f.label}</div><input class="field sm" ${f.type==='date'?'type="date"':''} value="${s[f.k]||''}" ${f.type==='date'?'':`placeholder="Enter ${f.label.toLowerCase()}"`} onchange="setDoc('${prefix}','${k}','${f.k}',this.value)"></div>`).join('');
+    const editPanel = s.editing ? `<div class="doc-edit">${choiceHtml}${fieldsHtml}<button class="pu-btn save" onclick="docSave('${prefix}','${k}')">Save</button></div>` : '';
+    return `<div class="doc-card done${s.editing?' editing':''}">
+      <div class="doc-row" onclick="openDocSheet('${prefix}','${k}')">
+        <div class="doc-ico">${docIcon}</div>
+        <div class="doc-main">
+          <div class="doc-name">${def.name}</div>
+          <div class="doc-status">${okIcon} Uploaded${s.file?` · <span class="doc-file">${s.file}</span>`:''}</div>
+          ${meta?`<div class="doc-meta">${meta}</div>`:''}
         </div>
-        <button class="upload-btn" id="up_${prefix}_${k}" onclick="mockUpload('${prefix}','${k}',this,${def.image?'true':'false'})">${upIcon} ${uploadLabel}</button>
-        <div class="doc-fields" id="df_${prefix}_${k}">${choiceHtml}${fieldsHtml}</div>
-      </div>`;
+        <button class="doc-more" onclick="event.stopPropagation();openDocSheet('${prefix}','${k}')">${kebabIcon}</button>
+      </div>
+      ${editPanel}
+    </div>`;
   }
 
-  /* doc state setters — prefix 'drv' = driver docs, 'v0'/'v1' = vehicle index */
+  /* doc state — prefix 'drv' = driver docs, 'v0'/'v1' = vehicle index */
   function docStore(prefix) {
     if (prefix === 'drv') return state.docs;
     return state.vehicles[+prefix.slice(1)].docs;
   }
-  function setDoc(prefix, k, field, val) { docStore(prefix)[k][field] = val; }
+  function setDoc(prefix, k, field, val) { (docStore(prefix)[k] = docStore(prefix)[k] || {})[field] = val; }
   function setDocChoice(prefix, k, c, el) {
     docStore(prefix)[k].choice = c;
     el.parentNode.querySelectorAll('.seg').forEach(s=>s.classList.remove('on'));
     el.classList.add('on');
   }
-  function mockUpload(prefix, k, btn, isImage) {
-    docStore(prefix)[k].uploaded = true;
-    btn.classList.add('done');
-    btn.innerHTML = okIcon + ' Uploaded · ' + (isImage ? 'photo.jpg' : 'sample.pdf');
-    document.getElementById('df_'+prefix+'_'+k).classList.add('show');
+  function docPick(prefix, k) {
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'application/pdf,image/*';
+    inp.onchange = () => { const f = inp.files && inp.files[0]; if (f) docSetFile(prefix,k,f); };
+    inp.click();
   }
-  function restoreDoc(prefix, def, st) {
-    if (st && st.uploaded) {
-      const b = document.getElementById('up_'+prefix+'_'+def.id);
-      if (b) { b.classList.add('done'); b.innerHTML = okIcon + ' Uploaded · ' + (def.image?'photo.jpg':'sample.pdf');
-        document.getElementById('df_'+prefix+'_'+def.id).classList.add('show'); }
-    }
+  function docSetFile(prefix, k, f) {
+    const store = docStore(prefix), s = store[k] = store[k] || {};
+    if (s.url) { try { URL.revokeObjectURL(s.url); } catch(_){} }
+    s.uploaded = true; s.url = URL.createObjectURL(f); s.file = f.name; s.editing = false;  // stay collapsed
+    docChanged(prefix);
+  }
+  function docView(prefix, k) { const s = docStore(prefix)[k]; if (s && s.url) window.open(s.url, '_blank'); }
+  function docEdit(prefix, k) {
+    const store = docStore(prefix);
+    Object.keys(store).forEach(x => { if (store[x]) store[x].editing = false; });  // one open at a time
+    (store[k] = store[k] || {}).editing = true;
+    docChanged(prefix);
+  }
+  function docSave(prefix, k) { const s = docStore(prefix)[k]; if (s) s.editing = false; docChanged(prefix); }
+  function docDelete(prefix, k) {
+    const store = docStore(prefix), s = store[k];
+    if (s && s.url) { try { URL.revokeObjectURL(s.url); } catch(_){} }
+    store[k] = { uploaded:false };  // back to Upload state
+    docChanged(prefix);
+  }
+  function docChanged(prefix) {
+    if (prefix === 'drv') { renderDriverDocs(); return; }
+    const i = +prefix.slice(1), cont = document.getElementById('vdocs_v'+i);
+    if (cont) cont.innerHTML = vehDocsFor(state.vehicles[i]).map(d => docCard(d, state.vehicles[i].docs, 'v'+i)).join('');
+    updateVehProg(i); refreshOpenHeight(i);
+  }
+
+  /* ---- bottom sheet (single overflow → actions) ---- */
+  let _sheetActions = [];
+  function openSheet(title, actions) {
+    _sheetActions = actions;
+    document.getElementById('sheetTitle').textContent = title;
+    document.getElementById('sheetActions').innerHTML = actions.map((a,idx)=>`<button class="sheet-btn${a.danger?' danger':''}" onclick="sheetDo(${idx})">${a.icon}<span>${a.label}</span></button>`).join('');
+    document.getElementById('sheet').classList.add('open');
+  }
+  function closeSheet() { document.getElementById('sheet').classList.remove('open'); }
+  function sheetDo(idx) { const a = _sheetActions[idx]; closeSheet(); if (a && a.fn) a.fn(); }  // sync — keeps file-picker in user gesture
+  function docDef(prefix, k) { return (prefix==='drv'?DRIVER_DOCS:VEHICLE_DOCS).find(d => d.id===k); }
+  function openDocSheet(prefix, k) {
+    const def = docDef(prefix, k);
+    openSheet(def ? def.name : 'Document', [
+      { label:'Preview',          icon:eyeIcon,   fn:()=>docView(prefix,k) },
+      { label:'Edit Details',     icon:editIcon,  fn:()=>docEdit(prefix,k) },
+      { label:'Replace Document', icon:retryIcon, fn:()=>docPick(prefix,k) },
+      { label:'Delete Document',  icon:trashIcon, danger:true, fn:()=>docDelete(prefix,k) },
+    ]);
+  }
+  function openMediaSheet(kind, i, si) {
+    const label = kind==='photo' ? PHOTO_SLOTS[si] : VIDEO_SLOTS[si];
+    openSheet(label, [
+      { label:'Preview', icon:eyeIcon,   fn:()=>previewUp(kind,i,si) },
+      { label:'Replace', icon:retryIcon, fn:()=>pickFile(kind,i,si) },
+      { label:'Delete',  icon:trashIcon, danger:true, fn:()=>deleteUp(kind,i,si) },
+    ]);
   }
 
   /* ---- step 2: driver documents ---- */
   function renderDriverDocs() {
-    document.getElementById('docList').innerHTML = DRIVER_DOCS.map(d => docCard(d, state.docs, 'drv')).join('');
-    DRIVER_DOCS.forEach(d => restoreDoc('drv', d, state.docs[d.id]));
+    const done = DRIVER_DOCS_REQ.filter(k => state.docs[k]?.uploaded).length, total = DRIVER_DOCS_REQ.length;
+    const pct = Math.round(done/total*100), full = done===total;
+    document.getElementById('docList').innerHTML =
+      `<div class="doc-prog"><div class="mini-bar"><i class="${full?'full':''}" style="width:${pct}%"></i></div><span class="acc-prog-txt">${done} of ${total} Uploaded</span></div>`
+      + DRIVER_DOCS.map(d => docCard(d, state.docs, 'drv')).join('');
   }
   function nextDriverDocs() {
     const ok = DRIVER_DOCS_REQ.every(k => state.docs[k]?.uploaded);
@@ -1661,14 +1992,33 @@
   /* ---- step 3: ambulance details (number + type only) ---- */
   function addVehicle() {
     if (state.vehicles.length >= 2) { document.getElementById('limitNote').classList.add('show'); return; }
-    state.vehicles.push({ number:'', type:'', docs:{}, photos:{}, videos:{} });
+    state.vehicles.push({ number:'', type:'', variant:'', serviceClass:'', shortName:'', docs:{}, photos:{}, videos:{} });
     renderVehicleDetails();
   }
   function removeVehicle(i) { state.vehicles.splice(i,1); renderVehicleDetails(); }
   function setVeh(i, field, val) { state.vehicles[i][field] = val; }
-  function pickType(i, t, el) {
-    el.parentNode.querySelectorAll('.seg').forEach(s=>s.classList.remove('on'));
-    el.classList.add('on'); setVeh(i,'type',t);
+  function openVariantSheet(i) {
+    const v = state.vehicles[i];
+    document.getElementById('sheetTitle').textContent = 'Select ambulance type';
+    let html = '';
+    AMB_GROUPS.forEach(g => {
+      html += `<div class="vsheet-group">${g}</div>`;
+      AMB_VARIANTS.filter(x => x.cls === g).forEach(x => {
+        html += `<button class="vopt ${v.variant===x.id?'on':''}" onclick="pickVariant(${i},'${x.id}')">
+          <span class="cls-badge ${x.cls}">${x.cls}</span>
+          <div class="vopt-main"><div class="vopt-name">${x.type}</div><div class="vopt-short">${x.short}</div></div>
+          <span class="vopt-check">${okIcon}</span></button>`;
+      });
+    });
+    document.getElementById('sheetActions').innerHTML = html;
+    document.getElementById('sheet').classList.add('open');
+  }
+  function pickVariant(i, id) {
+    const x = variantById(id); if (!x) return;
+    const v = state.vehicles[i];
+    v.variant = x.id; v.type = x.type; v.serviceClass = x.cls; v.shortName = x.short;
+    closeSheet();
+    renderVehicleDetails();
   }
   function renderVehicleDetails() {
     document.getElementById('vehList').innerHTML = state.vehicles.map((v,i) => `
@@ -1680,7 +2030,13 @@
         <div class="field-group"><div class="mini-label">Vehicle number</div><input class="field sm" value="${v.number}" placeholder="e.g. KA01AB1234" oninput="setVeh(${i},'number',this.value)"></div>
         <div class="field-group">
           <div class="mini-label">Ambulance type</div>
-          <div class="segmented">${VEH_TYPES.map(t=>`<button class="seg ${v.type===t?'on':''}" onclick="pickType(${i},'${t}',this)">${t}</button>`).join('')}</div>
+          <button class="type-select" onclick="openVariantSheet(${i})">
+            ${v.variant ? `<div class="ts-main">
+              <div class="ts-row"><span class="cls-badge ${v.serviceClass}">${v.serviceClass}</span><span class="ts-short">${v.shortName}</span></div>
+              <span class="ts-name">${v.type}</span>
+            </div>` : `<span class="ts-ph">Select ambulance type</span>`}
+            <span class="ts-chev">${chevIcon}</span>
+          </button>
         </div>
       </div>`).join('');
     const n = state.vehicles.length;
@@ -1695,14 +2051,59 @@
   }
 
   /* ---- step 4: ambulance documents (calibration only for ALS/ICU) ---- */
-  function vehDocsFor(v) { return VEHICLE_DOCS.filter(d => !d.aclsOnly || isACLS(v.type)); }
+  function vehDocsFor(v) { return VEHICLE_DOCS.filter(d => !d.aclsOnly || isACLS(v)); }
   function renderVehicleDocs() {
     document.getElementById('vehDocList').innerHTML = state.vehicles.map((v,i) => `
-      <div class="veh-card">
-        <div class="veh-title" style="margin-bottom:12px;"><span class="dot">${i+1}</span> ${v.number||('Ambulance '+(i+1))}${v.type?(' · '+v.type):''}</div>
-        ${vehDocsFor(v).map(d => docCard(d, v.docs, 'v'+i)).join('')}
+      <div class="acc-card" id="acc_v${i}">
+        <div class="acc-head" onclick="toggleVehAcc(${i})">
+          <span class="dot">${i+1}</span>
+          <div class="acc-main">
+            <div class="acc-name">${v.number||('Ambulance '+(i+1))}</div>
+            <div class="acc-meta">
+              ${v.serviceClass?`<span class="cls-badge ${v.serviceClass}">${v.serviceClass}</span>`:''}
+              ${v.shortName?`<span class="acc-type-txt">${v.shortName}</span>`:''}
+              <span class="acc-prog" id="prog_v${i}"></span>
+            </div>
+          </div>
+          <span class="acc-chev">${chevIcon}</span>
+        </div>
+        <div class="acc-body" id="body_v${i}">
+          <div class="acc-body-inner">
+            <div id="vdocs_v${i}">${vehDocsFor(v).map(d => docCard(d, v.docs, 'v'+i)).join('')}</div>
+          </div>
+        </div>
       </div>`).join('');
-    state.vehicles.forEach((v,i) => vehDocsFor(v).forEach(d => restoreDoc('v'+i, d, v.docs[d.id])));
+    state.vehicles.forEach((v,i) => updateVehProg(i));
+    // start with only the first ambulance expanded (rest header-only)
+    requestAnimationFrame(() => openVehAcc(0));
+  }
+  function updateVehProg(i) {
+    const v = state.vehicles[i]; if (!v) return;
+    const docs = vehDocsFor(v);
+    const done = docs.filter(d => v.docs[d.id]?.uploaded).length;
+    const el = document.getElementById('prog_v'+i); if (!el) return;
+    const pct = docs.length ? Math.round(done/docs.length*100) : 0, full = done===docs.length;
+    el.innerHTML = `<div class="mini-bar"><i class="${full?'full':''}" style="width:${pct}%"></i></div><span class="acc-prog-txt">${done} of ${docs.length} Uploaded</span>`;
+  }
+  function accBody(i) { return document.getElementById('body_v'+i); }
+  function openVehAcc(i) {
+    state.vehicles.forEach((_, j) => {
+      const card = document.getElementById('acc_v'+j), body = accBody(j);
+      if (!card || !body) return;
+      if (j === i) { card.classList.add('open'); body.style.maxHeight = body.firstElementChild.scrollHeight + 'px'; }
+      else { card.classList.remove('open'); body.style.maxHeight = '0px'; }
+    });
+  }
+  function toggleVehAcc(i) {
+    const card = document.getElementById('acc_v'+i);
+    if (card && card.classList.contains('open')) {
+      card.classList.remove('open');
+      const body = accBody(i); if (body) body.style.maxHeight = '0px';
+    } else openVehAcc(i);
+  }
+  function refreshOpenHeight(i) {
+    const card = document.getElementById('acc_v'+i), body = accBody(i);
+    if (card && card.classList.contains('open') && body) body.style.maxHeight = body.firstElementChild.scrollHeight + 'px';
   }
   function nextVehicleDocs() {
     const ok = state.vehicles.every(v => vehDocsFor(v).every(d => v.docs[d.id]?.uploaded));
@@ -1710,43 +2111,345 @@
     if (ok) showScreen('reg-photos');
   }
 
-  /* ---- step 5: vehicle photos ---- */
-  function togglePhoto(i, si) { state.vehicles[i].photos[si] = true; renderPhotos(); }
+  /* ---- upload states shared by photos + videos ---- */
+  const UP_CFG = {
+    photo: { accept:'image/jpeg,image/png', exts:['jpg','jpeg','png'], max: 5*1024*1024,
+             fmt:'Only JPG, JPEG and PNG are supported.',
+             size:'File exceeds the maximum allowed size. Please upload a smaller file.', action:'Retake' },
+    video: { accept:'video/mp4,video/quicktime', exts:['mp4','mov'], max: 50*1024*1024,
+             fmt:'Only MP4 and MOV are supported.',
+             size:'File exceeds the maximum allowed size. Please upload a smaller file.', action:'Replace' },
+  };
+  function upStore(kind,i) {
+    const v = state.vehicles[i];
+    if (kind==='photo') return (v.photos = v.photos || {});
+    return (v.videos = v.videos || {});
+  }
+  function upRender(kind) { kind==='photo' ? renderPhotos() : renderVideos(); }
+  function upIsDone(e) { return e && e.status==='done'; }
+
+  function pickFile(kind,i,si) {
+    const cfg = UP_CFG[kind];
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = cfg.accept;
+    inp.onchange = () => { const f = inp.files && inp.files[0]; if (f) handleUpFile(kind,i,si,f); };
+    inp.click();
+  }
+  function handleUpFile(kind,i,si,file) {
+    const cfg = UP_CFG[kind], store = upStore(kind,i);
+    const e = store[si] = store[si] || { status:'empty' };
+    const ext = (file.name.split('.').pop()||'').toLowerCase();
+    if (!cfg.exts.includes(ext)) { e.error = cfg.fmt; upRender(kind); return; }  // preserve prior file
+    if (file.size > cfg.max)     { e.error = cfg.size; upRender(kind); return; }
+    e.error = null;
+    startUp(kind,i,si,file);
+  }
+  function startUp(kind,i,si,file) {
+    const store = upStore(kind,i);
+    const e = store[si] = store[si] || { status:'empty' };
+    const prevUrl = e.url;
+    e._file = file; e.status = 'uploading'; e.error = null;
+    upRender(kind);
+    setTimeout(() => {
+      const ok = Math.random() > 0.15;   // simulated network result
+      if (ok) {
+        if (prevUrl) { try { URL.revokeObjectURL(prevUrl); } catch(_){} }
+        e.url = URL.createObjectURL(file); e.name = file.name; e.size = file.size;
+        e.status = 'done'; e.error = null;
+      } else if (prevUrl) {
+        e.status = 'done'; e.error = 'Upload failed. Please try again.';  // keep existing file
+      } else {
+        e.status = 'failed';
+      }
+      upRender(kind);
+    }, 1200);
+  }
+  function retryUp(kind,i,si) {
+    const e = upStore(kind,i)[si];
+    if (e && e._file) startUp(kind,i,si,e._file); else pickFile(kind,i,si);
+  }
+  function deleteUp(kind,i,si) {
+    const store = upStore(kind,i), e = store[si];
+    if (e && e.url) { try { URL.revokeObjectURL(e.url); } catch(_){} }
+    delete store[si];
+    upRender(kind);
+  }
+  function previewUp(kind,i,si) {
+    const e = upStore(kind,i)[si];
+    if (e && e.url) window.open(e.url, '_blank');
+  }
+
+  /* ---- step 5: vehicle photos (compact list) ---- */
+  function togglePhotoMenu(btn) {
+    const menu = btn.closest('.pu-menu'), open = menu.classList.contains('open');
+    document.querySelectorAll('.pu-menu.open').forEach(m => m.classList.remove('open'));
+    if (!open) menu.classList.add('open');
+  }
+  document.addEventListener('click', ev => {
+    if (!ev.target.closest('.pu-menu')) document.querySelectorAll('.pu-menu.open').forEach(m => m.classList.remove('open'));
+  });
+  /* compact media row — shared by photos + videos (same pattern as doc cards) */
+  function mediaRow(kind,i,si,label,e) {
+    const st = (e&&e.status)||'empty', err = e&&e.error;
+    let thumb, status, action;
+    if (st==='done') {
+      const inner = kind==='photo' ? `<img src="${e.url}" alt="">` : `<video src="${e.url}" muted playsinline></video>`;
+      thumb = `<div class="pu-thumb">${inner}<span class="pu-tick">${okIcon}</span></div>`;
+      status = `<div class="pu-status ok">${okIcon} Uploaded</div>`;
+      action = `<button class="doc-more" onclick="event.stopPropagation();openMediaSheet('${kind}',${i},${si})">${kebabIcon}</button>`;
+    } else if (st==='uploading') {
+      thumb = `<div class="pu-thumb"><div class="pu-spin"></div></div>`;
+      status = `<div class="pu-status">Uploading…</div>`;
+      action = '';
+    } else if (st==='failed') {
+      thumb = `<div class="pu-thumb err">${warnIcon}</div>`;
+      status = `<div class="pu-status err">Upload failed</div>`;
+      action = `<button class="pu-btn retry" onclick="retryUp('${kind}',${i},${si})">${retryIcon} Retry</button>`;
+    } else {
+      thumb = `<div class="pu-thumb${err?' err':''}">${kind==='photo'?camIcon:vidIcon}</div>`;
+      status = `<div class="pu-status${err?' err':''}">${err?'Not uploaded':'Required'}</div>`;
+      action = `<button class="pu-btn" onclick="pickFile('${kind}',${i},${si})">${upIcon} Upload</button>`;
+    }
+    const errLine = (err && st!=='failed') ? `<div class="pu-error">${err}</div>` : '';
+    const clickAttr = st==='done' ? ` onclick="openMediaSheet('${kind}',${i},${si})" style="cursor:pointer"` : '';
+    return `<div class="pu-cell"><div class="pu-item ${st}"${clickAttr}>${thumb}<div class="pu-main"><div class="pu-name">${label}</div>${status}</div><div class="pu-act">${action}</div></div>${errLine}</div>`;
+  }
   function renderPhotos() {
     document.getElementById('photoList').innerHTML = state.vehicles.map((v,i) => {
       v.photos = v.photos || {};
-      return `<div class="veh-card">
-        <div class="veh-title" style="margin-bottom:10px;"><span class="dot">${i+1}</span> ${v.number||('Ambulance '+(i+1))}</div>
+      return `<div class="veh-card pu-card">
+        <div class="veh-title"><span class="dot">${i+1}</span> ${v.number||('Ambulance '+(i+1))}</div>
         <div class="veh-docs-label">Vehicle photos</div>
-        <div class="photo-grid">${PHOTO_SLOTS.map((s,si)=>`
-          <div class="photo-tile ${v.photos[si]?'done':''}" onclick="togglePhoto(${i},${si})">
-            ${v.photos[si]?okIcon:camIcon}<div class="pt-label">${s}</div></div>`).join('')}</div>
+        <div class="pu-list">${PHOTO_SLOTS.map((s,si)=>mediaRow('photo',i,si,s,v.photos[si])).join('')}</div>
       </div>`;
     }).join('');
   }
   function nextPhotos() {
-    const ok = state.vehicles.every(v => PHOTO_SLOTS.every((_,si) => v.photos && v.photos[si]));
+    const ok = state.vehicles.every(v => PHOTO_SLOTS.every((_,si) => upIsDone(v.photos && v.photos[si])));
     showNote('notePhotos', !ok);
     if (ok) showScreen(hasACLS() ? 'reg-videos' : 'reg-review');
   }
 
   /* ---- step 6: functional videos (ALS/ICU only) ---- */
-  function toggleVideo(i, si) { state.vehicles[i].videos[si] = true; renderVideos(); }
   function renderVideos() {
-    const acls = state.vehicles.map((v,i)=>({v,i})).filter(o => isACLS(o.v.type));
+    const acls = state.vehicles.map((v,i)=>({v,i})).filter(o => isACLS(o.v));
     document.getElementById('videoList').innerHTML = acls.length ? acls.map(({v,i}) => {
       v.videos = v.videos || {};
-      return `<div class="veh-card">
-        <div class="veh-title" style="margin-bottom:10px;"><span class="dot">${i+1}</span> ${v.number||('Ambulance '+(i+1))} · ${v.type}</div>
+      return `<div class="veh-card pu-card">
+        <div class="veh-title"><span class="dot">${i+1}</span> ${v.number||('Ambulance '+(i+1))} · ${v.shortName||v.type}</div>
         <div class="veh-docs-label">Functional videos</div>
-        ${VIDEO_SLOTS.map((s,si)=>`<button class="upload-btn ${v.videos[si]?'done':''}" style="margin-bottom:8px;" onclick="toggleVideo(${i},${si})">${v.videos[si]?okIcon+' Uploaded · clip.mp4':vidIcon+' '+s}</button>`).join('')}
+        <div class="pu-list">${VIDEO_SLOTS.map((s,si)=>mediaRow('video',i,si,s,v.videos[si])).join('')}</div>
       </div>`;
     }).join('') : '<div class="doc-sub" style="text-align:center;padding:24px;">No ALS / ICU ambulances — no videos required.</div>';
   }
   function nextVideos() {
-    const ok = state.vehicles.filter(v=>isACLS(v.type)).every(v => VIDEO_SLOTS.every((_,si) => v.videos && v.videos[si]));
+    const ok = state.vehicles.filter(v=>isACLS(v)).every(v => VIDEO_SLOTS.every((_,si) => upIsDone(v.videos && v.videos[si])));
     showNote('noteVideos', !ok);
     if (ok) goReview();
+  }
+
+  /* ============ RIDE TRIP TIMER (patient pickup → hospital) ============ */
+  let _tripTimer = null, _tripStart = 0;
+  function startTripTimer() {
+    _tripStart = Date.now();
+    if (_tripTimer) clearInterval(_tripTimer);
+    showScreen('navigate-destination');
+    updateTripTimer();
+    _tripTimer = setInterval(updateTripTimer, 1000);
+  }
+  function updateTripTimer() {
+    const el = document.getElementById('ttTime'); if (!el) return;
+    const s = Math.max(0, Math.floor((Date.now() - _tripStart) / 1000));
+    el.textContent = String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+  }
+  function stopTripTimer() { if (_tripTimer) { clearInterval(_tripTimer); _tripTimer = null; } }
+
+  /* ============ EARNINGS — range filters, charts, history, export ============ */
+  const EARN_TODAY = '2026-07-01';
+  const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const RIDES = [
+    { id:'R-2041', date:'2026-07-01', hospital:'Apollo Hospital',   distance:8.1,  minutes:16, fare:700,  mode:'Online', status:'Completed' },
+    { id:'R-2040', date:'2026-07-01', hospital:'Fortis Hospital',   distance:11.4, minutes:22, fare:920,  mode:'Cash',   status:'Completed' },
+    { id:'R-2038', date:'2026-07-01', hospital:'Manipal Hospital',  distance:5.2,  minutes:12, fare:430,  mode:'UPI',    status:'Completed' },
+    { id:'R-2035', date:'2026-06-30', hospital:'Manipal Hospital',  distance:9.2,  minutes:18, fare:780,  mode:'Cash',   status:'Completed' },
+    { id:'R-2031', date:'2026-06-29', hospital:'Narayana Health',   distance:14.6, minutes:28, fare:1180, mode:'Online', status:'Completed' },
+    { id:'R-2028', date:'2026-06-28', hospital:'Apollo Hospital',   distance:3.1,  minutes:9,  fare:300,  mode:'UPI',    status:'Cancelled' },
+    { id:'R-2024', date:'2026-06-27', hospital:'Fortis Hospital',   distance:7.7,  minutes:15, fare:640,  mode:'Online', status:'Completed' },
+    { id:'R-2019', date:'2026-06-25', hospital:'Columbia Asia',     distance:12.3, minutes:25, fare:1020, mode:'Cash',   status:'Completed' },
+    { id:'R-2012', date:'2026-06-20', hospital:'Apollo Hospital',   distance:6.4,  minutes:14, fare:560,  mode:'Online', status:'Completed' },
+    { id:'R-2007', date:'2026-06-14', hospital:'Manipal Hospital',  distance:10.1, minutes:20, fare:840,  mode:'UPI',    status:'Completed' },
+    { id:'R-1998', date:'2026-06-08', hospital:'Fortis Hospital',   distance:4.8,  minutes:11, fare:410,  mode:'Cash',   status:'Completed' },
+    { id:'R-1990', date:'2026-06-03', hospital:'Apollo Hospital',   distance:15.2, minutes:30, fare:1240, mode:'Online', status:'Completed' },
+    { id:'R-1975', date:'2026-05-26', hospital:'Narayana Health',   distance:9.9,  minutes:19, fare:820,  mode:'Cash',   status:'Completed' },
+    { id:'R-1960', date:'2026-05-15', hospital:'Manipal Hospital',  distance:5.5,  minutes:13, fare:470,  mode:'UPI',    status:'Completed' },
+  ];
+  const earnState = { range:'week', from:'', to:'', q:'', mode:'', status:'', sort:'date' };
+
+  function _d(s) { const [y,m,d] = s.split('-').map(Number); return new Date(Date.UTC(y, m-1, d)); }
+  function _iso(dt) { return dt.toISOString().slice(0,10); }
+  function _diffDays(s) { return Math.round((_d(EARN_TODAY) - _d(s)) / 86400000); }
+  function _fmtDate(s) { const [y,m,d] = s.split('-').map(Number); return String(d).padStart(2,'0') + ' ' + MON[m-1]; }
+  function _inr(n) { return '₹' + Number(n).toLocaleString('en-IN'); }
+
+  function earnInRange(r) {
+    if (earnState.from && earnState.to) return r.date >= earnState.from && r.date <= earnState.to;
+    const diff = _diffDays(r.date);
+    if (earnState.range==='today') return diff===0;
+    if (earnState.range==='week')  return diff>=0 && diff<7;
+    if (earnState.range==='month') return diff>=0 && diff<30;
+    return true; // all
+  }
+  function earnCompleted(list) { return list.filter(r => r.status==='Completed'); }
+  function earnSum(list) { return earnCompleted(list).reduce((t,r)=>t+r.fare, 0); }
+  function earnFilteredHistory() {
+    let list = RIDES.filter(earnInRange);
+    if (earnState.q)      list = list.filter(r => r.id.toLowerCase().includes(earnState.q.toLowerCase()));
+    if (earnState.mode)   list = list.filter(r => r.mode===earnState.mode);
+    if (earnState.status) list = list.filter(r => r.status===earnState.status);
+    const s = earnState.sort;
+    return list.slice().sort((a,b) => s==='distance' ? b.distance-a.distance : s==='fare' ? b.fare-a.fare : (_d(b.date)-_d(a.date)));
+  }
+
+  function setEarnRange(r) { earnState.range=r; earnState.from=''; earnState.to=''; renderEarnings(); closeSheet(); }
+  function setEarnFrom(v)   { earnState.from=v; renderEarnings(); }
+  function setEarnTo(v)     { earnState.to=v; renderEarnings(); }
+  function setEarnQ(v)      { earnState.q=v; renderEarnings(); }
+  function setEarnMode(v)   { earnState.mode=v; renderEarnings(); }
+  function setEarnStatus(v) { earnState.status=v; renderEarnings(); }
+  function setEarnSort(v)   { earnState.sort=v; renderEarnings(); }
+  function _opt(val,label,cur) { return `<option value="${val}" ${cur===val?'selected':''}>${label}</option>`; }
+
+  function renderEarnings() {
+    const body = document.getElementById('earnBody'); if (!body) return;
+    const range = RIDES.filter(earnInRange);
+    const total = earnSum(range), comp = earnCompleted(range);
+    const trips = comp.length, dist = comp.reduce((t,r)=>t+r.distance,0), avg = trips ? Math.round(total/trips) : 0;
+    const custom = !!(earnState.from && earnState.to);
+    const label = custom ? 'Custom' : { today:'Today', week:'This week', month:'Last 30 days', all:'All time' }[earnState.range];
+    // compact range span
+    let rStart, rEnd;
+    if (custom) { rStart = earnState.from; rEnd = earnState.to; }
+    else if (earnState.range==='today') { rStart = rEnd = EARN_TODAY; }
+    else if (earnState.range==='week')  { rEnd = EARN_TODAY; rStart = _iso(new Date(_d(EARN_TODAY).getTime()-6*86400000)); }
+    else if (earnState.range==='month') { rEnd = EARN_TODAY; rStart = _iso(new Date(_d(EARN_TODAY).getTime()-29*86400000)); }
+    else { const ds = RIDES.map(r=>r.date).slice().sort(); rStart = ds[0]; rEnd = ds[ds.length-1]; }
+    const dateSpan = `${_fmtDate(rStart)} – ${_fmtDate(rEnd)}`;
+
+    const todayTot = earnCompleted(RIDES.filter(r => r.date===EARN_TODAY)).reduce((t,r)=>t+r.fare,0);
+    // weekly bars (trailing 7 days)
+    const days = [];
+    for (let k=6; k>=0; k--) {
+      const dt = new Date(_d(EARN_TODAY).getTime() - k*86400000), iso = _iso(dt);
+      const rev = earnCompleted(RIDES.filter(r => r.date===iso)).reduce((t,r)=>t+r.fare,0);
+      days.push({ lbl:['S','M','T','W','T','F','S'][dt.getUTCDay()], rev, today: iso===EARN_TODAY });
+    }
+    const maxR = Math.max(...days.map(d=>d.rev), 1);
+    const barsHtml = days.map(d => `<div class="bar-col ${d.today?'bar-today':''}"><div class="bar-track"><div class="bar-fill" style="height:${Math.round(d.rev/maxR*100)}%"></div></div><div class="bar-lbl">${d.lbl}</div></div>`).join('');
+    // monthly (trailing 30 days)
+    const month = earnCompleted(RIDES.filter(r => { const dd=_diffDays(r.date); return dd>=0 && dd<30; }));
+    const mTot = month.reduce((t,r)=>t+r.fare,0), mTrips = month.length, mAvg = mTrips ? Math.round(mTot/mTrips) : 0;
+    // history
+    const hist = earnFilteredHistory();
+    const histHtml = hist.length ? hist.map(r => `
+      <div class="ride-item">
+        <div class="ri-top"><span class="ri-id">${r.id}</span><span class="ri-fare">${_inr(r.fare)}</span></div>
+        <div class="ri-hosp">${r.hospital}</div>
+        <div class="ri-bot"><span>${_fmtDate(r.date)}</span><span class="sep">·</span><span>${r.distance} km</span><span class="sep">·</span><span>${r.minutes} min</span><span class="chip">${r.mode}</span><span class="chip ${r.status==='Completed'?'ok':'cancel'}">${r.status}</span></div>
+      </div>`).join('') : '<div class="earn-empty">No rides match these filters.</div>';
+    const hasFilters = earnState.mode || earnState.status || earnState.sort!=='date';
+
+    body.innerHTML = `
+      <div class="range-bar">
+        <div class="rb-text"><span class="rb-label">${label}</span><span class="rb-sep">·</span><span class="rb-dates">${dateSpan}</span></div>
+        <button class="rb-change" onclick="openRangeSheet()">Change</button>
+      </div>
+
+      <div class="go-card earn-hero" style="background:linear-gradient(150deg,var(--purple-500),var(--purple-700));">
+        <div class="eh-top">
+          <div style="min-width:0;"><div class="gc-sub" style="opacity:.85;">${label}</div><div class="eh-total">${_inr(total)}</div></div>
+          <div class="eh-today">Today<b>${_inr(todayTot)}</b></div>
+        </div>
+        <div class="eh-stats">
+          <div><span>Trips</span><b>${trips}</b></div>
+          <div><span>Distance</span><b>${dist.toFixed(1)} km</b></div>
+          <div><span>Avg / trip</span><b>${_inr(avg)}</b></div>
+        </div>
+      </div>
+
+      <div class="sec-title">Weekly revenue</div>
+      <div class="card card-tight"><div class="bars">${barsHtml}</div></div>
+
+      <div class="sec-title">Monthly overview</div>
+      <div class="card card-tight">
+        <div style="display:flex;gap:16px;align-items:flex-end;">
+          <div style="flex:1;"><div style="font-size:11px;color:var(--ink-500);font-weight:600;">Last 30 days</div><div style="font-size:19px;font-weight:800;color:var(--ink-900);margin-top:2px;">${_inr(mTot)}</div></div>
+          <div><div style="font-size:11px;color:var(--ink-500);font-weight:600;">Trips</div><div style="font-size:15px;font-weight:700;margin-top:2px;">${mTrips}</div></div>
+          <div><div style="font-size:11px;color:var(--ink-500);font-weight:600;">Avg / trip</div><div style="font-size:15px;font-weight:700;margin-top:2px;">${_inr(mAvg)}</div></div>
+        </div>
+      </div>
+
+      <div class="sec-title">Ride history</div>
+      <input class="field sm" style="margin-bottom:8px;" placeholder="Search Ride ID" value="${earnState.q}" onchange="setEarnQ(this.value)">
+      <div class="hist-tools">
+        <button class="tool-btn ${hasFilters?'active':''}" onclick="openFiltersSheet()">${filterIcon} Filters${hasFilters?'<span class="tb-dot"></span>':''}</button>
+        <button class="tool-btn" onclick="openExportMenu()">${dlIcon} Export</button>
+      </div>
+      <div>${histHtml}</div>
+    `;
+  }
+
+  /* earnings action sheets */
+  function openRangeSheet() {
+    const seg = ['today','week','month','all'].map(r =>
+      `<button class="${(!earnState.from && earnState.range===r)?'on':''}" onclick="setEarnRange('${r}')">${{today:'Today',week:'Week',month:'Month',all:'All'}[r]}</button>`).join('');
+    document.getElementById('sheetTitle').textContent = 'Select date range';
+    document.getElementById('sheetActions').innerHTML = `<div class="sheet-pad">
+      <div class="seg-range" style="margin-bottom:12px;">${seg}</div>
+      <div class="range-row">
+        <div class="rr-field"><label>Start date</label><input type="date" class="field sm" value="${earnState.from}" onchange="setEarnFrom(this.value)"></div>
+        <div class="arrow">→</div>
+        <div class="rr-field"><label>End date</label><input type="date" class="field sm" value="${earnState.to}" onchange="setEarnTo(this.value)"></div>
+      </div>
+      <button class="pu-btn save" style="width:100%;margin-top:6px;" onclick="closeSheet()">Apply</button>
+    </div>`;
+    document.getElementById('sheet').classList.add('open');
+  }
+  function openFiltersSheet() {
+    document.getElementById('sheetTitle').textContent = 'Filters';
+    document.getElementById('sheetActions').innerHTML = `<div class="sheet-pad">
+      <div class="filt-field"><label>Payment mode</label><select class="field sm" onchange="setEarnMode(this.value)">${_opt('','All modes',earnState.mode)}${_opt('Cash','Cash',earnState.mode)}${_opt('Online','Online',earnState.mode)}${_opt('UPI','UPI',earnState.mode)}</select></div>
+      <div class="filt-field"><label>Status</label><select class="field sm" onchange="setEarnStatus(this.value)">${_opt('','All status',earnState.status)}${_opt('Completed','Completed',earnState.status)}${_opt('Cancelled','Cancelled',earnState.status)}</select></div>
+      <div class="filt-field"><label>Sort by</label><select class="field sm" onchange="setEarnSort(this.value)">${_opt('date','Date (newest)',earnState.sort)}${_opt('distance','Distance (high→low)',earnState.sort)}${_opt('fare','Fare (high→low)',earnState.sort)}</select></div>
+      <div style="display:flex;gap:9px;margin-top:4px;">
+        <button class="pu-btn" style="flex:1;justify-content:center;" onclick="clearEarnFilters()">Clear</button>
+        <button class="pu-btn save" style="flex:1;margin-top:0;" onclick="closeSheet()">Done</button>
+      </div>
+    </div>`;
+    document.getElementById('sheet').classList.add('open');
+  }
+  function clearEarnFilters() { earnState.mode=''; earnState.status=''; earnState.sort='date'; renderEarnings(); openFiltersSheet(); }
+  function openExportMenu() {
+    openSheet('Export ride history', [
+      { label:'Export PDF', icon:dlIcon, fn:exportPDF },
+      { label:'Export CSV', icon:dlIcon, fn:exportCSV },
+    ]);
+  }
+
+  function exportCSV() {
+    const list = earnFilteredHistory();
+    const head = ['Ride ID','Date','Hospital','Distance (km)','Duration (min)','Fare (INR)','Payment Mode','Status'];
+    const rows = list.map(r => [r.id, r.date, r.hospital, r.distance, r.minutes, r.fare, r.mode, r.status]);
+    const csv = [head, ...rows].map(row => row.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type:'text/csv' }), url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'medurun-ride-history.csv'; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  function exportPDF() {
+    const list = earnFilteredHistory(), total = earnSum(list);
+    const rowsHtml = list.map(r => `<tr><td>${r.id}</td><td>${_fmtDate(r.date)}</td><td>${r.hospital}</td><td>${r.distance} km</td><td>₹${r.fare}</td><td>${r.mode}</td><td>${r.status}</td></tr>`).join('');
+    const w = window.open('', '_blank'); if (!w) return;
+    w.document.write(`<html><head><title>Medurun Ride History</title><style>body{font-family:system-ui,Arial,sans-serif;padding:24px;color:#1b1830}h1{font-size:18px;margin:0 0 4px}p{color:#555;font-size:13px}table{width:100%;border-collapse:collapse;margin-top:14px;font-size:12px}th,td{border:1px solid #ddd;padding:6px 8px;text-align:left}th{background:#f3effb}</style></head><body><h1>Medurun — Ride History</h1><p>Total earned: <b>₹${total.toLocaleString('en-IN')}</b> · ${list.length} rides</p><table><thead><tr><th>Ride ID</th><th>Date</th><th>Hospital</th><th>Distance</th><th>Fare</th><th>Mode</th><th>Status</th></tr></thead><tbody>${rowsHtml}</tbody></table><scr`+`ipt>onload=function(){print()}</scr`+`ipt></body></html>`);
+    w.document.close();
   }
 
   /* ---- helpers ---- */
@@ -1780,14 +2483,14 @@
         ${DRIVER_DOCS.map(d=>row(d.name + (d.id==='idproof'&&state.docs.idproof?.choice?` (${state.docs.idproof.choice})`:''), state.docs[d.id]?.uploaded?'Uploaded':(d.optional?'Skipped':'Pending'))).join('')}
       </div>`;
     state.vehicles.forEach((v,i)=>{
-      const acls = isACLS(v.type);
+      const acls = isACLS(v);
       const docsTotal = vehDocsFor(v).length;
       const docsUp = vehDocsFor(v).filter(d=>v.docs[d.id]?.uploaded).length;
-      const photos = Object.keys(v.photos||{}).length;
-      const vids = Object.keys(v.videos||{}).length;
+      const photos = Object.values(v.photos||{}).filter(upIsDone).length;
+      const vids = Object.values(v.videos||{}).filter(upIsDone).length;
       html += `<div class="sum-card">
         <div class="sum-top"><div class="sum-check">${okIcon}</div><div class="sum-title">Ambulance ${i+1}</div><span class="sum-edit" onclick="showScreen('reg-vehicle')">Edit</span></div>
-        ${row('Vehicle number', v.number)}${row('Type', v.type)}
+        ${row('Vehicle number', v.number)}${row('Ambulance type', v.type)}${row('Service class', v.serviceClass)}${row('Short name', v.shortName)}
         ${row('Documents', docsUp+' / '+docsTotal+' uploaded')}
         ${row('Photos', photos+' / '+PHOTO_SLOTS.length)}
         ${acls?row('Videos', vids+' / '+VIDEO_SLOTS.length):''}
@@ -1799,7 +2502,7 @@
         <div class="primary-pick">${state.vehicles.map((v,i)=>`
           <div class="opt ${state.primary===i?'on':''}" onclick="setPrimary(${i})">
             <div class="radio"></div>
-            <div><div class="pt">${v.number||('Ambulance '+(i+1))}</div><div class="ps">${v.type||'Type not set'}</div></div>
+            <div><div class="pt">${v.number||('Ambulance '+(i+1))}</div><div class="ps">${v.shortName||'Type not set'}</div></div>
           </div>`).join('')}</div></div>`;
     }
     document.getElementById('reviewBody').innerHTML = html;
@@ -1819,13 +2522,14 @@
       document.getElementById('dashSheet')?.classList.remove('expanded');
       const a = document.getElementById('dashAmb');
       if (a) a.textContent = prototypeState.driverScenario === 'agencyDriver'
-        ? 'KA01AB1234 · ALS · LifeLine'
-        : `${ambList()[activeAmb<0?0:activeAmb].num} · ${ambList()[activeAmb<0?0:activeAmb].type}`;
+        ? 'KA01AB1234 · ALS Winger · LifeLine'
+        : `${ambList()[activeAmb<0?0:activeAmb].num} · ${ambList()[activeAmb<0?0:activeAmb].short}`;
     }
     if (id === 'waiting') document.getElementById('waitSheet')?.classList.remove('expanded');
     if (id === 'ambulance-select') { if (prototypeState.driverScenario === 'agencyDriver') activeAmb = -1; showNote('noteAmb', false); renderAmbSelect(); }
     if (id === 'vehicles')    renderVehiclesApp();
     if (id === 'documents')   renderDocuments();
+    if (id === 'earnings')    renderEarnings();
     origShow(id);
     if (id === 'otp') { resetOtpCells(); startOtpTimer(); setTimeout(()=>document.querySelector('.otp-cell')?.focus(), 60); }
     if (id === 'ride-request') startRideCountdown();
@@ -1867,14 +2571,14 @@
 
   /* ============ MOCK DATA ============ */
   const AMBS = [
-    { num:'KA01AB1234', type:'ALS', status:'verified', model:'Force Traveller' },
-    { num:'KA05CD5678', type:'BLS', status:'verified', model:'Maruti Eeco' },
+    { num:'KA01AB1234', type:'ALS (Force Tempo Traveller Ambulance)', cls:'ACLS', short:'ALS Tempo', status:'verified', model:'Force Traveller' },
+    { num:'KA05CD5678', type:'BLS (Eeco Ambulance)',                  cls:'BLS',  short:'BLS Eeco',  status:'verified', model:'Maruti Eeco' },
   ];
   // agency-assigned fleet (shown only for agency drivers)
   const AGENCY_AMBS = [
-    { num:'KA01AB1234', type:'ALS' },
-    { num:'RJ14XX5678', type:'BLS' },
-    { num:'MH12XX9012', type:'ICU' },
+    { num:'KA01AB1234', type:'ALS (TATA Winger Ambulance)',           cls:'ACLS', short:'ALS Winger' },
+    { num:'RJ14XX5678', type:'BLS (TATA Winger Ambulance)',           cls:'BLS',  short:'BLS Winger' },
+    { num:'MH12XX9012', type:'Neonatal ALS (TATA Winger Ambulance)',  cls:'ACLS', short:'Neo ALS Winger' },
   ];
   let activeAmb = 0;
 
@@ -1947,8 +2651,8 @@
       <div class="amb-opt ${activeAmb===i?'on':''}" onclick="pickAmb(${i})">
         <div class="amb-ico">${ambIcon}</div>
         <div style="flex:1;min-width:0;">
-          <div class="amb-num">${a.type} Ambulance</div>
-          <div class="amb-meta">${a.num}${a.model?(' · '+a.model):''}</div>
+          <div class="amb-num" style="display:flex;align-items:center;gap:7px;"><span class="cls-badge ${a.cls}">${a.cls}</span>${a.short}</div>
+          <div class="amb-meta">${a.num} · ${a.type}</div>
           ${agency?'<span class="badge b-verified" style="margin-top:6px;"><span class="dotmark"></span>Assigned by Agency</span>':''}
         </div>
         <div class="radio"></div>
@@ -1959,7 +2663,7 @@
     showNote('noteAmb', false);
     renderAmbSelect();
     const a = ambList()[i];
-    const d = document.getElementById('dashAmb'); if (d) d.textContent = `${a.num} · ${a.type}`;
+    const d = document.getElementById('dashAmb'); if (d) d.textContent = `${a.num} · ${a.short}`;
   }
   function confirmAmbSelect(){
     if (activeAmb < 0) { showNote('noteAmb', true); return; }
@@ -1971,7 +2675,7 @@
       <div class="card flat">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
           <div class="amb-ico" style="width:44px;height:44px;">${ambIcon}</div>
-          <div style="flex:1;"><div class="amb-num">${a.num}</div><div class="amb-meta">${a.type} · ${a.model}</div></div>
+          <div style="flex:1;"><div class="amb-num" style="display:flex;align-items:center;gap:7px;"><span class="cls-badge ${a.cls}">${a.cls}</span>${a.num}</div><div class="amb-meta">${a.short} · ${a.model}</div></div>
           ${activeAmb===i?'<span class="type-tag">ACTIVE TODAY</span>':''}
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
