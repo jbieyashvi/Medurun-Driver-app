@@ -274,6 +274,25 @@
   .veh-remove { font-size: 12.5px; font-weight: 700; color: #D14343; cursor: pointer; }
   .veh-docs-label { font-size: 11.5px; font-weight: 700; color: var(--ink-500); letter-spacing: .04em; text-transform: uppercase; margin: 4px 0 10px; }
 
+  /* ============ ACCORDION: AMBULANCE DOC SECTIONS ============ */
+  .acc-card { border: 1.5px solid var(--line); border-radius: var(--radius-card); margin-bottom: 12px; overflow: hidden; background: var(--white); transition: border-color .2s; }
+  .acc-card.open { border-color: var(--purple-200, #C9B6F5); }
+  .acc-head { display: flex; align-items: center; gap: 11px; padding: 13px 15px; cursor: pointer; user-select: none; }
+  .acc-head .dot { width: 30px; height: 30px; border-radius: 9px; background: var(--purple-500); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .acc-main { min-width: 0; flex: 1; }
+  .acc-name { font-size: 15px; font-weight: 700; color: var(--ink-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .acc-meta { display: flex; align-items: center; gap: 7px; margin-top: 4px; flex-wrap: wrap; }
+  .acc-type { font-size: 10.5px; font-weight: 700; color: var(--purple-700); background: var(--purple-50); border: 1px solid var(--purple-100); padding: 2px 7px; border-radius: 99px; letter-spacing: .02em; }
+  .acc-prog { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
+  .acc-prog .pdot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .acc-prog.pending { color: #B45309; background: #FEF6E7; border: 1px solid #FAE3B5; }
+  .acc-prog.done { color: #1F9D4D; background: #EEF9F0; border: 1px solid #BBE5C4; }
+  .acc-chev { flex-shrink: 0; color: var(--ink-300); transition: transform .3s ease; }
+  .acc-chev svg { width: 20px; height: 20px; display: block; }
+  .acc-card.open .acc-chev { transform: rotate(180deg); }
+  .acc-body { max-height: 0; overflow: hidden; transition: max-height .32s ease; }
+  .acc-body-inner { padding: 2px 15px 15px; }
+
   .counter-pill { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; color: var(--purple-700); background: var(--purple-50); border: 1px solid var(--purple-100); padding: 8px 12px; border-radius: 11px; margin-bottom: 12px; }
   .counter-pill svg { width: 15px; height: 15px; }
   .add-veh { width: 100%; height: 48px; border-radius: 12px; border: 1.6px dashed #CFC7E0; background: var(--white); color: var(--purple-600); font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -391,6 +410,89 @@
   .photo-tile svg { width: 19px; height: 19px; }
   .photo-tile.done { border-style: solid; border-color: #BBE5C4; background: #EEF9F0; color: #1F9D4D; }
   .photo-tile .pt-label { line-height: 1.2; }
+
+  /* ---- upload states (photos + videos) ---- */
+  .up-list { display: flex; flex-direction: column; gap: 9px; }
+  .up-tile { border: 1.6px dashed #CFC7E0; background: var(--purple-50); border-radius: 12px; overflow: hidden; transition: border-color .15s, background .15s; }
+  .up-tile.done, .up-tile.failed { border-style: solid; }
+  .up-tile.done { border-color: #BBE5C4; background: #EEF9F0; }
+  .up-tile.failed { border-color: #F5C6C2; background: #FDEDEC; }
+  .up-body { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 92px; padding: 10px 8px; text-align: center; }
+  .up-empty { cursor: pointer; color: var(--purple-600); }
+  .up-empty svg { width: 20px; height: 20px; }
+  .up-label { font-size: 10.5px; font-weight: 600; line-height: 1.25; color: inherit; }
+  .up-empty .up-label { color: var(--ink-500); }
+  .up-cta { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: var(--purple-600); }
+  .up-cta svg { width: 13px; height: 13px; }
+  .up-uploading { color: var(--purple-600); }
+  .up-spin { width: 20px; height: 20px; border: 2.5px solid var(--purple-100); border-top-color: var(--purple-500); border-radius: 50%; animation: upspin .7s linear infinite; }
+  @keyframes upspin { to { transform: rotate(360deg); } }
+  .up-bar { width: 76%; height: 4px; border-radius: 99px; background: var(--purple-100); overflow: hidden; }
+  .up-bar i { display: block; height: 100%; width: 40%; border-radius: 99px; background: var(--purple-500); animation: upbar 1.05s ease-in-out infinite; }
+  @keyframes upbar { 0% { margin-left: -40%; } 100% { margin-left: 100%; } }
+  .up-done { gap: 8px; }
+  .up-thumb { position: relative; width: 100%; max-width: 128px; aspect-ratio: 16 / 10; border-radius: 9px; overflow: hidden; background: rgba(0,0,0,.06); }
+  .up-thumb img, .up-thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .up-badge { position: absolute; right: 5px; bottom: 5px; width: 20px; height: 20px; border-radius: 50%; background: #1F9D4D; color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .up-badge svg { width: 12px; height: 12px; }
+  .up-meta { display: flex; flex-direction: column; gap: 1px; }
+  .up-label.ok { color: #1F9D4D; font-weight: 700; }
+  .up-status { font-size: 10px; font-weight: 700; color: #1F9D4D; letter-spacing: .03em; }
+  .up-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  .up-actions button { font-size: 11px; font-weight: 700; color: var(--purple-600); background: var(--white); border: 1px solid var(--purple-100); border-radius: 8px; padding: 5px 9px; cursor: pointer; }
+  .up-actions button.danger { color: #D14343; border-color: #F5C6C2; }
+  .up-failed { gap: 8px; }
+  .up-err-in { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #C0392B; }
+  .up-err-in svg { width: 15px; height: 15px; }
+  .up-retry { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; color: #fff; background: var(--purple-500); border: none; border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+  .up-retry svg { width: 13px; height: 13px; }
+  .up-error { display: flex; align-items: flex-start; gap: 6px; font-size: 10.5px; font-weight: 600; color: #C0392B; background: #FDEDEC; border-top: 1px solid #F5C6C2; padding: 7px 9px; text-align: left; line-height: 1.3; }
+  .up-error svg { width: 13px; height: 13px; flex-shrink: 0; margin-top: 1px; }
+  /* video tiles: full-width row layout */
+  .up-tile.vid .up-body { flex-direction: row; justify-content: flex-start; text-align: left; gap: 12px; min-height: 64px; }
+  .up-tile.vid .up-empty .up-cta { margin-left: auto; }
+  .up-tile.vid .up-uploading .up-bar { flex: 1; width: auto; }
+  .up-tile.vid .up-done .up-thumb { width: 128px; flex-shrink: 0; }
+  .up-tile.vid .up-done .up-meta { margin-right: auto; }
+  .up-tile.vid .up-failed { justify-content: space-between; }
+  .up-tile.vid .up-failed .up-retry { margin-left: auto; }
+
+  /* ---- compact vehicle-photo upload items ---- */
+  .pu-card { padding: 12px; margin-bottom: 9px; }
+  .pu-card .veh-title { margin-bottom: 8px !important; }
+  .pu-card .veh-docs-label { margin: 2px 0 8px; }
+  .pu-list { display: flex; flex-direction: column; gap: 7px; }
+  .pu-item { display: flex; align-items: center; gap: 10px; border: 1.5px solid var(--line); border-radius: 11px; padding: 7px 9px; background: var(--white); }
+  .pu-item.done { border-color: #BBE5C4; background: #F5FCF7; }
+  .pu-item.failed { border-color: #F5C6C2; background: #FDEDEC; }
+  .pu-thumb { position: relative; width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--purple-50); color: var(--purple-600); }
+  .pu-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pu-thumb svg { width: 17px; height: 17px; }
+  .pu-thumb.err { background: #FDEDEC; color: #C0392B; }
+  .pu-tick { position: absolute; right: -3px; bottom: -3px; width: 16px; height: 16px; border-radius: 50%; background: #1F9D4D; color: #fff; border: 2px solid var(--white); display: flex; align-items: center; justify-content: center; }
+  .pu-tick svg { width: 9px; height: 9px; }
+  .pu-spin { width: 18px; height: 18px; border: 2.4px solid var(--purple-100); border-top-color: var(--purple-500); border-radius: 50%; animation: upspin .7s linear infinite; }
+  .pu-main { flex: 1; min-width: 0; }
+  .pu-name { font-size: 12.5px; font-weight: 700; color: var(--ink-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pu-status { display: flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 600; color: var(--ink-300); margin-top: 1px; }
+  .pu-status svg { width: 12px; height: 12px; }
+  .pu-status.ok { color: #1F9D4D; }
+  .pu-status.err { color: #C0392B; }
+  .pu-act { flex-shrink: 0; display: flex; align-items: center; gap: 3px; }
+  .pu-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; color: var(--purple-600); background: var(--purple-50); border: 1px solid var(--purple-100); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+  .pu-btn svg { width: 13px; height: 13px; }
+  .pu-btn.retry { color: #fff; background: var(--purple-500); border-color: var(--purple-500); }
+  .pu-menu { position: relative; }
+  .pu-kebab { width: 30px; height: 30px; border-radius: 8px; border: none; background: none; color: var(--ink-500); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .pu-kebab svg { width: 17px; height: 17px; }
+  .pu-kebab:active { background: var(--line); }
+  .pu-pop { position: absolute; right: 0; top: calc(100% + 4px); min-width: 132px; background: var(--white); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 22px rgba(0,0,0,.12); padding: 4px; z-index: 20; display: none; }
+  .pu-menu.open .pu-pop { display: block; }
+  .pu-pop button { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; font-size: 12.5px; font-weight: 600; color: var(--ink-900); background: none; border: none; border-radius: 7px; padding: 8px 10px; cursor: pointer; }
+  .pu-pop button svg { width: 14px; height: 14px; }
+  .pu-pop button:active { background: var(--purple-50); }
+  .pu-pop button.danger { color: #D14343; }
+  .pu-error { font-size: 10.5px; font-weight: 600; color: #C0392B; line-height: 1.3; margin: 4px 2px 0; }
 
   /* ============ REUSABLE: REVIEW SUMMARY ============ */
   .sum-card { border: 1.5px solid var(--line); border-radius: var(--radius-card); padding: 15px; margin-bottom: 11px; }
@@ -661,7 +763,7 @@
         </div>
 
         <div class="heading">
-          <h2>Welcome to<br>Medurun Driver</h2>
+          <h2>Driver Sign In</h2>
           <p>Sign in using your registered mobile number.</p>
         </div>
 
@@ -818,8 +920,8 @@
         <div class="heading"><h2>Driver documents</h2><p>Upload your verification documents.</p></div>
       </div>
       <div class="scroll" style="padding-top:16px;">
-        <div id="docList"><!-- JS rendered --></div>
         <div class="val-note" id="noteDocs">Please upload all required documents before continuing.</div>
+        <div id="docList"><!-- JS rendered --></div>
       </div>
       <div class="actionbar"><button class="btn" onclick="nextDriverDocs()">Continue</button></div>
     </section>
@@ -869,8 +971,8 @@
         <div class="heading"><h2>Ambulance documents</h2><p>Upload documents for each ambulance.</p></div>
       </div>
       <div class="scroll" style="padding-top:16px;">
-        <div id="vehDocList"><!-- JS rendered --></div>
         <div class="val-note" id="noteVehDocs">Please upload all required ambulance documents before continuing.</div>
+        <div id="vehDocList"><!-- JS rendered --></div>
       </div>
       <div class="actionbar"><button class="btn" onclick="nextVehicleDocs()">Continue</button></div>
     </section>
@@ -890,8 +992,8 @@
         <div class="heading"><h2>Vehicle photos</h2><p>Capture each required angle.</p></div>
       </div>
       <div class="scroll" style="padding-top:16px;">
-        <div id="photoList"><!-- JS rendered --></div>
         <div class="val-note" id="notePhotos">Please upload all required vehicle photos before continuing.</div>
+        <div id="photoList"><!-- JS rendered --></div>
       </div>
       <div class="actionbar"><button class="btn" onclick="nextPhotos()">Continue</button></div>
     </section>
@@ -911,8 +1013,8 @@
         <div class="heading"><h2>Functional videos</h2><p>Required for ALS / ICU ambulances.</p></div>
       </div>
       <div class="scroll" style="padding-top:16px;">
-        <div id="videoList"><!-- JS rendered --></div>
         <div class="val-note" id="noteVideos">Please upload all required functional videos before continuing.</div>
+        <div id="videoList"><!-- JS rendered --></div>
       </div>
       <div class="actionbar"><button class="btn" onclick="nextVideos()">Continue</button></div>
     </section>
@@ -1380,7 +1482,7 @@
           <div style="flex:1;"><div style="font-size:13.5px;font-weight:650;color:var(--ink-900);">Added to today's earnings</div><div style="font-size:12px;color:var(--ink-500);">Paid via Medurun · Cash collected</div></div>
         </div>
       </div>
-      <div class="actionbar"><button class="btn" onclick="showScreen('waiting')">Back to Online</button></div>
+      <div class="actionbar"><button class="btn" onclick="showScreen('waiting')">Ready for Next Ride</button></div>
     </section>
 
     <!-- ============ EARNINGS ============ -->
@@ -1597,6 +1699,12 @@
   const okIcon  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
   const camIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
   const vidIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>`;
+  const chevIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+  const warnIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+  const retryIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>`;
+  const kebabIcon = `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>`;
+  const eyeIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  const trashIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`;
 
   /* build a flexible doc card */
   function docCard(def, store, prefix) {
@@ -1638,6 +1746,7 @@
     btn.classList.add('done');
     btn.innerHTML = okIcon + ' Uploaded · ' + (isImage ? 'photo.jpg' : 'sample.pdf');
     document.getElementById('df_'+prefix+'_'+k).classList.add('show');
+    if (/^v\d+$/.test(prefix)) { const i = +prefix.slice(1); updateVehProg(i); refreshOpenHeight(i); }
   }
   function restoreDoc(prefix, def, st) {
     if (st && st.uploaded) {
@@ -1698,11 +1807,56 @@
   function vehDocsFor(v) { return VEHICLE_DOCS.filter(d => !d.aclsOnly || isACLS(v.type)); }
   function renderVehicleDocs() {
     document.getElementById('vehDocList').innerHTML = state.vehicles.map((v,i) => `
-      <div class="veh-card">
-        <div class="veh-title" style="margin-bottom:12px;"><span class="dot">${i+1}</span> ${v.number||('Ambulance '+(i+1))}${v.type?(' · '+v.type):''}</div>
-        ${vehDocsFor(v).map(d => docCard(d, v.docs, 'v'+i)).join('')}
+      <div class="acc-card" id="acc_v${i}">
+        <div class="acc-head" onclick="toggleVehAcc(${i})">
+          <span class="dot">${i+1}</span>
+          <div class="acc-main">
+            <div class="acc-name">${v.number||('Ambulance '+(i+1))}</div>
+            <div class="acc-meta">
+              ${v.type?`<span class="acc-type">${v.type}</span>`:''}
+              <span class="acc-prog" id="prog_v${i}"></span>
+            </div>
+          </div>
+          <span class="acc-chev">${chevIcon}</span>
+        </div>
+        <div class="acc-body" id="body_v${i}">
+          <div class="acc-body-inner">
+            ${vehDocsFor(v).map(d => docCard(d, v.docs, 'v'+i)).join('')}
+          </div>
+        </div>
       </div>`).join('');
     state.vehicles.forEach((v,i) => vehDocsFor(v).forEach(d => restoreDoc('v'+i, d, v.docs[d.id])));
+    state.vehicles.forEach((v,i) => updateVehProg(i));
+    // start with only the first ambulance expanded (rest header-only)
+    requestAnimationFrame(() => openVehAcc(0));
+  }
+  function updateVehProg(i) {
+    const v = state.vehicles[i]; if (!v) return;
+    const docs = vehDocsFor(v);
+    const done = docs.filter(d => v.docs[d.id]?.uploaded).length;
+    const el = document.getElementById('prog_v'+i); if (!el) return;
+    el.className = 'acc-prog ' + (done === docs.length ? 'done' : 'pending');
+    el.innerHTML = `<span class="pdot"></span>${done}/${docs.length} Documents Uploaded`;
+  }
+  function accBody(i) { return document.getElementById('body_v'+i); }
+  function openVehAcc(i) {
+    state.vehicles.forEach((_, j) => {
+      const card = document.getElementById('acc_v'+j), body = accBody(j);
+      if (!card || !body) return;
+      if (j === i) { card.classList.add('open'); body.style.maxHeight = body.firstElementChild.scrollHeight + 'px'; }
+      else { card.classList.remove('open'); body.style.maxHeight = '0px'; }
+    });
+  }
+  function toggleVehAcc(i) {
+    const card = document.getElementById('acc_v'+i);
+    if (card && card.classList.contains('open')) {
+      card.classList.remove('open');
+      const body = accBody(i); if (body) body.style.maxHeight = '0px';
+    } else openVehAcc(i);
+  }
+  function refreshOpenHeight(i) {
+    const card = document.getElementById('acc_v'+i), body = accBody(i);
+    if (card && card.classList.contains('open') && body) body.style.maxHeight = body.firstElementChild.scrollHeight + 'px';
   }
   function nextVehicleDocs() {
     const ok = state.vehicles.every(v => vehDocsFor(v).every(d => v.docs[d.id]?.uploaded));
@@ -1710,28 +1864,152 @@
     if (ok) showScreen('reg-photos');
   }
 
-  /* ---- step 5: vehicle photos ---- */
-  function togglePhoto(i, si) { state.vehicles[i].photos[si] = true; renderPhotos(); }
+  /* ---- upload states shared by photos + videos ---- */
+  const UP_CFG = {
+    photo: { accept:'image/jpeg,image/png', exts:['jpg','jpeg','png'], max: 5*1024*1024,
+             fmt:'Only JPG, JPEG and PNG are supported.',
+             size:'File exceeds the maximum allowed size. Please upload a smaller file.', action:'Retake' },
+    video: { accept:'video/mp4,video/quicktime', exts:['mp4','mov'], max: 50*1024*1024,
+             fmt:'Only MP4 and MOV are supported.',
+             size:'File exceeds the maximum allowed size. Please upload a smaller file.', action:'Replace' },
+  };
+  function upStore(kind,i) {
+    const v = state.vehicles[i];
+    if (kind==='photo') return (v.photos = v.photos || {});
+    return (v.videos = v.videos || {});
+  }
+  function upRender(kind) { kind==='photo' ? renderPhotos() : renderVideos(); }
+  function upIsDone(e) { return e && e.status==='done'; }
+
+  function upTile(kind,i,si,label,e) {
+    const cfg = UP_CFG[kind], st = (e&&e.status)||'empty', cls = kind==='video'?'vid':'pho';
+    let body;
+    if (st==='uploading') {
+      body = `<div class="up-body up-uploading"><div class="up-spin"></div><div class="up-label">Uploading…</div><div class="up-bar"><i></i></div></div>`;
+    } else if (st==='done') {
+      const thumb = kind==='photo' ? `<img src="${e.url}" alt="">` : `<video src="${e.url}" muted playsinline></video>`;
+      body = `<div class="up-body up-done">
+        <div class="up-thumb">${thumb}<span class="up-badge">${okIcon}</span></div>
+        <div class="up-meta"><div class="up-label ok">${label}</div><div class="up-status">Uploaded</div></div>
+        <div class="up-actions">
+          <button onclick="previewUp('${kind}',${i},${si})">Preview</button>
+          <button onclick="pickFile('${kind}',${i},${si})">${cfg.action}</button>
+          <button class="danger" onclick="deleteUp('${kind}',${i},${si})">Delete</button>
+        </div></div>`;
+    } else if (st==='failed') {
+      body = `<div class="up-body up-failed"><div class="up-err-in">${warnIcon} Upload failed. Please try again.</div><button class="up-retry" onclick="retryUp('${kind}',${i},${si})">${retryIcon} Retry</button></div>`;
+    } else {
+      body = `<div class="up-body up-empty" onclick="pickFile('${kind}',${i},${si})">${kind==='photo'?camIcon:vidIcon}<div class="up-label">${label}</div><span class="up-cta">${upIcon} Upload</span></div>`;
+    }
+    const err = (e&&e.error) ? `<div class="up-error">${warnIcon}<span>${e.error}</span></div>` : '';
+    return `<div class="up-tile ${cls} ${st}">${body}${err}</div>`;
+  }
+
+  function pickFile(kind,i,si) {
+    const cfg = UP_CFG[kind];
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = cfg.accept;
+    inp.onchange = () => { const f = inp.files && inp.files[0]; if (f) handleUpFile(kind,i,si,f); };
+    inp.click();
+  }
+  function handleUpFile(kind,i,si,file) {
+    const cfg = UP_CFG[kind], store = upStore(kind,i);
+    const e = store[si] = store[si] || { status:'empty' };
+    const ext = (file.name.split('.').pop()||'').toLowerCase();
+    if (!cfg.exts.includes(ext)) { e.error = cfg.fmt; upRender(kind); return; }  // preserve prior file
+    if (file.size > cfg.max)     { e.error = cfg.size; upRender(kind); return; }
+    e.error = null;
+    startUp(kind,i,si,file);
+  }
+  function startUp(kind,i,si,file) {
+    const store = upStore(kind,i);
+    const e = store[si] = store[si] || { status:'empty' };
+    const prevUrl = e.url;
+    e._file = file; e.status = 'uploading'; e.error = null;
+    upRender(kind);
+    setTimeout(() => {
+      const ok = Math.random() > 0.15;   // simulated network result
+      if (ok) {
+        if (prevUrl) { try { URL.revokeObjectURL(prevUrl); } catch(_){} }
+        e.url = URL.createObjectURL(file); e.name = file.name; e.size = file.size;
+        e.status = 'done'; e.error = null;
+      } else if (prevUrl) {
+        e.status = 'done'; e.error = 'Upload failed. Please try again.';  // keep existing file
+      } else {
+        e.status = 'failed';
+      }
+      upRender(kind);
+    }, 1200);
+  }
+  function retryUp(kind,i,si) {
+    const e = upStore(kind,i)[si];
+    if (e && e._file) startUp(kind,i,si,e._file); else pickFile(kind,i,si);
+  }
+  function deleteUp(kind,i,si) {
+    const store = upStore(kind,i), e = store[si];
+    if (e && e.url) { try { URL.revokeObjectURL(e.url); } catch(_){} }
+    delete store[si];
+    upRender(kind);
+  }
+  function previewUp(kind,i,si) {
+    const e = upStore(kind,i)[si];
+    if (e && e.url) window.open(e.url, '_blank');
+  }
+
+  /* ---- step 5: vehicle photos (compact list) ---- */
+  function togglePhotoMenu(btn) {
+    const menu = btn.closest('.pu-menu'), open = menu.classList.contains('open');
+    document.querySelectorAll('.pu-menu.open').forEach(m => m.classList.remove('open'));
+    if (!open) menu.classList.add('open');
+  }
+  document.addEventListener('click', ev => {
+    if (!ev.target.closest('.pu-menu')) document.querySelectorAll('.pu-menu.open').forEach(m => m.classList.remove('open'));
+  });
+  function photoRow(i,si,label,e) {
+    const st = (e&&e.status)||'empty', err = e&&e.error;
+    let thumb, status, action;
+    if (st==='done') {
+      thumb = `<div class="pu-thumb"><img src="${e.url}" alt=""><span class="pu-tick">${okIcon}</span></div>`;
+      status = `<div class="pu-status ok">${okIcon} Uploaded</div>`;
+      action = `<button class="pu-btn" onclick="previewUp('photo',${i},${si})">${eyeIcon} Preview</button>
+        <div class="pu-menu"><button class="pu-kebab" onclick="togglePhotoMenu(this)">${kebabIcon}</button>
+          <div class="pu-pop">
+            <button onclick="pickFile('photo',${i},${si})">${retryIcon} Replace</button>
+            <button class="danger" onclick="deleteUp('photo',${i},${si})">${trashIcon} Delete</button>
+          </div></div>`;
+    } else if (st==='uploading') {
+      thumb = `<div class="pu-thumb"><div class="pu-spin"></div></div>`;
+      status = `<div class="pu-status">Uploading…</div>`;
+      action = '';
+    } else if (st==='failed') {
+      thumb = `<div class="pu-thumb err">${warnIcon}</div>`;
+      status = `<div class="pu-status err">Upload failed</div>`;
+      action = `<button class="pu-btn retry" onclick="retryUp('photo',${i},${si})">${retryIcon} Retry</button>`;
+    } else {
+      thumb = `<div class="pu-thumb${err?' err':''}">${camIcon}</div>`;
+      status = `<div class="pu-status${err?' err':''}">${err?'Not uploaded':'Required'}</div>`;
+      action = `<button class="pu-btn" onclick="pickFile('photo',${i},${si})">${upIcon} Upload</button>`;
+    }
+    const errLine = (err && st!=='failed') ? `<div class="pu-error">${err}</div>` : '';
+    return `<div class="pu-cell"><div class="pu-item ${st}">${thumb}<div class="pu-main"><div class="pu-name">${label}</div>${status}</div><div class="pu-act">${action}</div></div>${errLine}</div>`;
+  }
   function renderPhotos() {
     document.getElementById('photoList').innerHTML = state.vehicles.map((v,i) => {
       v.photos = v.photos || {};
-      return `<div class="veh-card">
-        <div class="veh-title" style="margin-bottom:10px;"><span class="dot">${i+1}</span> ${v.number||('Ambulance '+(i+1))}</div>
+      return `<div class="veh-card pu-card">
+        <div class="veh-title"><span class="dot">${i+1}</span> ${v.number||('Ambulance '+(i+1))}</div>
         <div class="veh-docs-label">Vehicle photos</div>
-        <div class="photo-grid">${PHOTO_SLOTS.map((s,si)=>`
-          <div class="photo-tile ${v.photos[si]?'done':''}" onclick="togglePhoto(${i},${si})">
-            ${v.photos[si]?okIcon:camIcon}<div class="pt-label">${s}</div></div>`).join('')}</div>
+        <div class="pu-list">${PHOTO_SLOTS.map((s,si)=>photoRow(i,si,s,v.photos[si])).join('')}</div>
       </div>`;
     }).join('');
   }
   function nextPhotos() {
-    const ok = state.vehicles.every(v => PHOTO_SLOTS.every((_,si) => v.photos && v.photos[si]));
+    const ok = state.vehicles.every(v => PHOTO_SLOTS.every((_,si) => upIsDone(v.photos && v.photos[si])));
     showNote('notePhotos', !ok);
     if (ok) showScreen(hasACLS() ? 'reg-videos' : 'reg-review');
   }
 
   /* ---- step 6: functional videos (ALS/ICU only) ---- */
-  function toggleVideo(i, si) { state.vehicles[i].videos[si] = true; renderVideos(); }
   function renderVideos() {
     const acls = state.vehicles.map((v,i)=>({v,i})).filter(o => isACLS(o.v.type));
     document.getElementById('videoList').innerHTML = acls.length ? acls.map(({v,i}) => {
@@ -1739,12 +2017,12 @@
       return `<div class="veh-card">
         <div class="veh-title" style="margin-bottom:10px;"><span class="dot">${i+1}</span> ${v.number||('Ambulance '+(i+1))} · ${v.type}</div>
         <div class="veh-docs-label">Functional videos</div>
-        ${VIDEO_SLOTS.map((s,si)=>`<button class="upload-btn ${v.videos[si]?'done':''}" style="margin-bottom:8px;" onclick="toggleVideo(${i},${si})">${v.videos[si]?okIcon+' Uploaded · clip.mp4':vidIcon+' '+s}</button>`).join('')}
+        <div class="up-list">${VIDEO_SLOTS.map((s,si)=>upTile('video',i,si,s,v.videos[si])).join('')}</div>
       </div>`;
     }).join('') : '<div class="doc-sub" style="text-align:center;padding:24px;">No ALS / ICU ambulances — no videos required.</div>';
   }
   function nextVideos() {
-    const ok = state.vehicles.filter(v=>isACLS(v.type)).every(v => VIDEO_SLOTS.every((_,si) => v.videos && v.videos[si]));
+    const ok = state.vehicles.filter(v=>isACLS(v.type)).every(v => VIDEO_SLOTS.every((_,si) => upIsDone(v.videos && v.videos[si])));
     showNote('noteVideos', !ok);
     if (ok) goReview();
   }
@@ -1783,8 +2061,8 @@
       const acls = isACLS(v.type);
       const docsTotal = vehDocsFor(v).length;
       const docsUp = vehDocsFor(v).filter(d=>v.docs[d.id]?.uploaded).length;
-      const photos = Object.keys(v.photos||{}).length;
-      const vids = Object.keys(v.videos||{}).length;
+      const photos = Object.values(v.photos||{}).filter(upIsDone).length;
+      const vids = Object.values(v.videos||{}).filter(upIsDone).length;
       html += `<div class="sum-card">
         <div class="sum-top"><div class="sum-check">${okIcon}</div><div class="sum-title">Ambulance ${i+1}</div><span class="sum-edit" onclick="showScreen('reg-vehicle')">Edit</span></div>
         ${row('Vehicle number', v.number)}${row('Type', v.type)}
