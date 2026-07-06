@@ -406,6 +406,43 @@
   .search-pulse > span:nth-child(2) { animation-delay: .95s; }
   .search-pulse .map-car { box-shadow: 0 6px 18px -4px rgba(0,0,0,.3); }
 
+  /* --- onboarding form extras --- */
+  .opt-tag { font-size: 9.5px; font-weight: 600; color: var(--ink-300); background: var(--line); padding: 2px 6px; border-radius: 6px; margin-left: 6px; letter-spacing: .02em; text-transform: none; }
+  .fld-err { font-size: 11px; color: #C0392B; margin-top: 5px; display: none; }
+  .fld-err.show { display: block; }
+  .segmented.multi { gap: 8px; }
+  .segmented.multi .seg { width: 100%; justify-content: flex-start; text-align: left; padding: 0 14px; }
+  select.field.sm { appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23A8A2B6' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='4 6 8 11 12 6'/></svg>"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
+  .sub-label { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--purple-600); margin: 16px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+  .check-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; cursor: pointer; font-size: 12.5px; color: var(--ink-700); font-weight: 500; }
+  .check-item .check-box { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--ink-300); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+  .check-item .check-box svg { width: 12px; height: 12px; color: #fff; opacity: 0; }
+  .check-item.on { color: var(--ink-900); }
+  .check-item.on .check-box { background: var(--purple-500); border-color: var(--purple-500); }
+  .check-item.on .check-box svg { opacity: 1; }
+
+  /* verified mobile info card */
+  .info-card { display: flex; align-items: center; gap: 10px; border: 1.5px solid #BBE5C4; background: #EEF9F0; border-radius: 12px; padding: 9px 12px; margin-bottom: 10px; }
+  .info-card .ic-check { width: 24px; height: 24px; border-radius: 50%; background: #1F9D4D; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .info-card .ic-check svg { width: 14px; height: 14px; }
+  .info-card .ic-main { flex: 1; min-width: 0; }
+  .info-card .ic-l { font-size: 10.5px; color: #1F7A3D; font-weight: 600; }
+  .info-card .ic-v { font-size: 14px; font-weight: 700; color: var(--ink-900); margin-top: 1px; }
+  .info-card .ic-badge { font-size: 10px; font-weight: 700; color: #1F9D4D; background: #fff; border: 1px solid #BBE5C4; padding: 3px 8px; border-radius: 99px; flex-shrink: 0; }
+  /* helper text under label */
+  .lbl-hint { font-size: 10.5px; color: var(--ink-300); margin: -3px 0 6px; }
+  /* compact chips */
+  .segmented.chips .seg { height: 40px; }
+  /* checkbox list (categories) */
+  .check-list { border: 1.5px solid var(--line); border-radius: 12px; padding: 2px 12px; }
+  .check-list .check-item { border-bottom: 1px solid var(--line); }
+  .check-list .check-item:last-child { border-bottom: none; }
+  /* compact form rhythm (steps 1 & 2) */
+  .reg-compact .field-group { margin-bottom: 9px; }
+  .reg-compact .mini-label { margin-bottom: 5px; }
+  /* disabled CTA */
+  .btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+
   /* validation note */
   .val-note { margin-top: 4px; font-size: 12px; font-weight: 600; color: #C0392B; background: #FDEDEC; border: 1px solid #F5C6C2; border-radius: 10px; padding: 9px 12px; display: none; }
   .val-note.show { display: block; }
@@ -1028,26 +1065,35 @@
         </div>
         <div class="heading"><h2>Personal details</h2><p>Tell us about yourself.</p></div>
       </div>
-      <div class="scroll" style="padding-top:16px;">
-        <div class="field-group"><div class="mini-label">Full name</div><input class="field sm" id="r_name" placeholder="e.g. Rahul Sharma" /></div>
-        <div class="field-group"><div class="mini-label">Mobile number (verified)</div><input class="field sm" id="r_mobile" readonly style="background:var(--purple-50);color:var(--purple-700);font-weight:700;" /></div>
-        <div class="field-group"><div class="mini-label">Email address</div><input class="field sm" id="r_email" type="email" placeholder="name@email.com" /></div>
-        <div class="field-group"><div class="mini-label">City</div><input class="field sm" id="r_city" placeholder="e.g. Bengaluru" /></div>
-        <div class="field-group"><div class="mini-label">Date of birth</div><input class="field sm" id="r_dob" type="date" /></div>
+      <div class="scroll reg-compact" style="padding-top:14px;">
+        <div class="field-group"><div class="mini-label">Full name</div><input class="field sm" id="r_name" placeholder="e.g. Rahul Sharma" oninput="checkStep1()"><div class="fld-err" id="err_name"></div></div>
+
+        <div class="info-card">
+          <span class="ic-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div class="ic-main"><div class="ic-l">Verified mobile number</div><div class="ic-v" id="r_mobile_txt">+91 00000 00000</div></div>
+          <span class="ic-badge">Verified</span>
+        </div>
+
+        <div class="field-group"><div class="mini-label">Email <span class="opt-tag">Optional</span></div><input class="field sm" id="r_email" type="email" placeholder="name@email.com"></div>
+
+        <div class="row2">
+          <div class="field-group"><div class="mini-label">Date of birth</div><div class="lbl-hint">Minimum age 21</div><input class="field sm" id="r_dob" type="date" onchange="checkStep1()"><div class="fld-err" id="err_dob"></div></div>
+          <div class="field-group"><div class="mini-label">Experience</div><div class="lbl-hint">Minimum 2 years</div><input class="field sm" id="r_exp" type="number" inputmode="numeric" placeholder="Years" oninput="checkStep1()"><div class="fld-err" id="err_exp"></div></div>
+        </div>
+
         <div class="field-group">
           <div class="mini-label">Gender</div>
-          <div class="segmented" id="r_gender">
-            <button class="seg" onclick="pickSeg(this,'gender','Male')">Male</button>
-            <button class="seg" onclick="pickSeg(this,'gender','Female')">Female</button>
-            <button class="seg" onclick="pickSeg(this,'gender','Other')">Other</button>
+          <div class="segmented chips" id="r_gender">
+            <button class="seg" onclick="pickGender(this,'Male')">Male</button>
+            <button class="seg" onclick="pickGender(this,'Female')">Female</button>
           </div>
         </div>
       </div>
-      <div class="actionbar"><button class="btn" onclick="saveStep1()">Continue</button></div>
+      <div class="actionbar"><button class="btn" id="btnStep1" onclick="saveStep1()" disabled>Continue</button></div>
     </section>
 
-    <!-- ============ STEP 2 — DRIVER DOCUMENTS ============ -->
-    <section class="screen" id="reg-docs">
+    <!-- ============ STEP 2 — CREDENTIALS ============ -->
+    <section class="screen" id="reg-credentials">
       <div class="step-head">
         <div class="topbar">
           <div class="back" onclick="showScreen('registration')">
@@ -1058,20 +1104,35 @@
           <div class="track"><div class="fill" style="width:33%"></div></div>
           <div class="count">Step 2 of 6</div>
         </div>
-        <div class="heading"><h2>Driver documents</h2><p>Upload your verification documents.</p></div>
+        <div class="heading"><h2>Credentials</h2><p>Licence &amp; identity details.</p></div>
       </div>
-      <div class="scroll" style="padding-top:16px;">
-        <div class="val-note" id="noteDocs">Please upload all required documents before continuing.</div>
-        <div id="docList"><!-- JS rendered --></div>
+      <div class="scroll reg-compact" style="padding-top:14px;">
+        <div class="field-group"><div class="mini-label">Driving licence number</div><div class="lbl-hint">Exactly 15 characters</div><input class="field sm" id="c_licence" maxlength="15" placeholder="e.g. KA0120200012345" oninput="this.value=this.value.toUpperCase().replace(/\s/g,'');checkCred()"><div class="fld-err" id="err_licence"></div></div>
+        <div class="field-group"><div class="mini-label">Licence expiry date</div><input class="field sm" id="c_licexp" type="date" onchange="checkCred()"><div class="fld-err" id="err_licexp"></div></div>
+        <div class="field-group">
+          <div class="mini-label">Licence categories</div><div class="lbl-hint">Select at least one</div>
+          <div class="check-list" id="c_categories">
+            <div class="check-item" onclick="toggleCat(this,'LMV Non-Transport')"><span class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>LMV Non-Transport</span></div>
+            <div class="check-item" onclick="toggleCat(this,'LMV Transport')"><span class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>LMV Transport</span></div>
+            <div class="check-item" onclick="toggleCat(this,'HMV / HCMV Transport')"><span class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>HMV / HCMV Transport</span></div>
+          </div>
+          <div class="fld-err" id="err_categories"></div>
+        </div>
+        <div class="row2">
+          <div class="field-group"><div class="mini-label">Aadhaar number</div><div class="lbl-hint">12 digits</div><input class="field sm" id="c_aadhaar" inputmode="numeric" maxlength="14" placeholder="1234 5678 9012" oninput="fmtAadhaar(this);checkCred()"><div class="fld-err" id="err_aadhaar"></div></div>
+          <div class="field-group"><div class="mini-label">Blood group</div><div class="lbl-hint">&nbsp;</div>
+            <select class="field sm" id="c_blood" onchange="checkCred()"><option value="">Select</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>O+</option><option>O-</option><option>AB+</option><option>AB-</option></select>
+          </div>
+        </div>
       </div>
-      <div class="actionbar"><button class="btn" onclick="nextDriverDocs()">Continue</button></div>
+      <div class="actionbar"><button class="btn" id="btnCred" onclick="saveCredentials()" disabled>Continue</button></div>
     </section>
 
-    <!-- ============ STEP 3 — AMBULANCE DETAILS ============ -->
-    <section class="screen" id="reg-vehicle">
+    <!-- ============ STEP 3 — DRIVER DOCUMENTS ============ -->
+    <section class="screen" id="reg-docs">
       <div class="step-head">
         <div class="topbar">
-          <div class="back" onclick="showScreen('reg-docs')">
+          <div class="back" onclick="showScreen('reg-credentials')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
           </div>
         </div>
@@ -1079,29 +1140,20 @@
           <div class="track"><div class="fill" style="width:50%"></div></div>
           <div class="count">Step 3 of 6</div>
         </div>
-        <div class="heading"><h2>Ambulance details</h2><p>Register up to 2 ambulances.</p></div>
+        <div class="heading"><h2>Driver documents</h2><p>Upload your verification documents.</p></div>
       </div>
       <div class="scroll" style="padding-top:16px;">
-        <div class="counter-pill" id="vehCounter">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17h6M5 17H3v-6l2-5h11l4 5v6h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
-          <span id="vehCounterText">0 of 2 vehicles added</span>
-        </div>
-        <div id="vehList"><!-- JS rendered --></div>
-        <button class="add-veh" id="addVehBtn" onclick="addVehicle()">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add ambulance
-        </button>
-        <div class="limit-note" id="limitNote">Drivers with more than 2 ambulances must register as an Agency.</div>
-        <div class="val-note" id="noteVeh">Add at least one ambulance with vehicle number and type.</div>
+        <div class="val-note" id="noteDocs">Please upload all mandatory documents before continuing.</div>
+        <div id="docList"><!-- JS rendered --></div>
       </div>
-      <div class="actionbar"><button class="btn" onclick="nextVehicleDetails()">Continue</button></div>
+      <div class="actionbar"><button class="btn" onclick="nextDriverDocs()">Continue</button></div>
     </section>
 
-    <!-- ============ STEP 4 — AMBULANCE DOCUMENTS ============ -->
-    <section class="screen" id="reg-vehicle-docs">
+    <!-- ============ STEP 4 — AMBULANCE DETAILS (consolidated accordion) ============ -->
+    <section class="screen" id="reg-ambulance">
       <div class="step-head">
         <div class="topbar">
-          <div class="back" onclick="showScreen('reg-vehicle')">
+          <div class="back" onclick="showScreen('reg-docs')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
           </div>
         </div>
@@ -1109,20 +1161,26 @@
           <div class="track"><div class="fill" style="width:67%"></div></div>
           <div class="count">Step 4 of 6</div>
         </div>
-        <div class="heading"><h2>Ambulance documents</h2><p>Upload documents for each ambulance.</p></div>
+        <div class="heading"><h2>Ambulance details</h2><p>Details, equipment, documents, photos &amp; videos.</p></div>
       </div>
       <div class="scroll" style="padding-top:16px;">
-        <div class="val-note" id="noteVehDocs">Please upload all required ambulance documents before continuing.</div>
-        <div id="vehDocList"><!-- JS rendered --></div>
+        <div class="counter-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17h6M5 17H3v-6l2-5h11l4 5v6h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg><span id="vehCounterText">1 of 2 ambulances</span></div>
+        <div id="ambAccordion"><!-- JS rendered --></div>
+        <button class="add-veh" id="addVehBtn" onclick="addVehicle()">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add another ambulance
+        </button>
+        <div class="limit-note" id="limitNote">Drivers with more than 2 ambulances must register as an Agency.</div>
+        <div class="val-note" id="noteAmbStep">Complete all required ambulance fields, documents, photos and videos.</div>
       </div>
-      <div class="actionbar"><button class="btn" onclick="nextVehicleDocs()">Continue</button></div>
+      <div class="actionbar"><button class="btn" onclick="nextAmbulance()">Continue</button></div>
     </section>
 
-    <!-- ============ STEP 5 — VEHICLE PHOTO VERIFICATION ============ -->
-    <section class="screen" id="reg-photos">
+    <!-- ============ STEP 5 — REVIEW & SUBMIT ============ -->
+    <section class="screen" id="reg-review">
       <div class="step-head">
         <div class="topbar">
-          <div class="back" onclick="showScreen('reg-vehicle-docs')">
+          <div class="back" onclick="showScreen('reg-ambulance')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
           </div>
         </div>
@@ -1130,52 +1188,10 @@
           <div class="track"><div class="fill" style="width:83%"></div></div>
           <div class="count">Step 5 of 6</div>
         </div>
-        <div class="heading"><h2>Vehicle photos</h2><p>Capture each required angle.</p></div>
-      </div>
-      <div class="scroll" style="padding-top:16px;">
-        <div class="val-note" id="notePhotos">Please upload all required vehicle photos before continuing.</div>
-        <div id="photoList"><!-- JS rendered --></div>
-      </div>
-      <div class="actionbar"><button class="btn" onclick="nextPhotos()">Continue</button></div>
-    </section>
-
-    <!-- ============ STEP 6 — FUNCTIONAL VIDEOS (ALS/ICU only) ============ -->
-    <section class="screen" id="reg-videos">
-      <div class="step-head">
-        <div class="topbar">
-          <div class="back" onclick="showScreen('reg-photos')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-          </div>
-        </div>
-        <div class="stepper">
-          <div class="track"><div class="fill" style="width:100%"></div></div>
-          <div class="count">Step 6 of 6</div>
-        </div>
-        <div class="heading"><h2>Functional videos</h2><p>Required for ALS / ICU ambulances.</p></div>
-      </div>
-      <div class="scroll" style="padding-top:16px;">
-        <div class="val-note" id="noteVideos">Please upload all required functional videos before continuing.</div>
-        <div id="videoList"><!-- JS rendered --></div>
-      </div>
-      <div class="actionbar"><button class="btn" onclick="nextVideos()">Continue</button></div>
-    </section>
-
-    <!-- ============ REVIEW & SUBMIT ============ -->
-    <section class="screen" id="reg-review">
-      <div class="step-head">
-        <div class="topbar">
-          <div class="back" onclick="backFromReview()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-          </div>
-        </div>
-        <div class="stepper">
-          <div class="track"><div class="fill" style="width:100%"></div></div>
-          <div class="count">Review</div>
-        </div>
-        <div class="heading"><h2>Review &amp; submit</h2><p>Confirm your details before submitting.</p></div>
+        <div class="heading"><h2>Review &amp; submit</h2><p>Confirm everything before submitting.</p></div>
       </div>
       <div class="scroll" style="padding-top:16px;" id="reviewBody"><!-- JS rendered --></div>
-      <div class="actionbar"><button class="btn" onclick="showScreen('pending')">Submit Registration</button></div>
+      <div class="actionbar"><button class="btn" onclick="submitRegistration()">Submit for Admin Review</button></div>
     </section>
 
     <!-- ============ SUCCESS ============ -->
@@ -1775,9 +1791,10 @@
   /* ============ PROTOTYPE STATE ============ */
   const state = {
     mobile: '',
-    personal: { name:'', mobile:'', email:'', city:'', dob:'', gender:'' },
-    docs: {},          // keyed by doc id -> {uploaded, number, issue, expiry}
-    vehicles: [],      // [{number, type, docs:{}}]
+    personal: { name:'', mobile:'', email:'', dob:'', experience:'', gender:'' },
+    credentials: { licence:'', licenceExpiry:'', categories:[], aadhaar:'', blood:'' },
+    docs: {},          // keyed by doc id -> {uploaded, number, expiry, ...}
+    vehicles: [],      // [{regNo, variant, serviceClass, ..., equipment, docs, photos, videos}]
     primary: 0
   };
 
@@ -1809,24 +1826,41 @@
   /* doc definitions — expiry flag synced to Super Admin Document Expiry module */
   /* driver documents — flexible field sets (synced w/ Super Admin checklist) */
   const DRIVER_DOCS = [
-    { id:'dl',      name:'Driving Licence', fields:[
-        {k:'number',label:'Licence number'},{k:'issue',label:'Issue date',type:'date'},{k:'expiry',label:'Expiry date',type:'date'}] },
-    { id:'pan',     name:'PAN Card', fields:[{k:'number',label:'PAN number'}] },
-    { id:'idproof', name:'Aadhaar / Voter ID', choice:['Aadhaar','Voter ID'], fields:[{k:'number',label:'ID number'}] },
-    { id:'bank',    name:'Bank Passbook', fields:[
-        {k:'bank',label:'Bank name'},{k:'account',label:'Account number'},{k:'ifsc',label:'IFSC code'}] },
-    { id:'photo',   name:'Passport Size Photo', optional:true, image:true, fields:[] },
+    { id:'emt',          name:'EMT Certification',            fields:[{k:'number',label:'Certificate number'},{k:'expiry',label:'Valid till',type:'date'}] },
+    { id:'experience',   name:'Experience Certificate',       fields:[{k:'number',label:'Issued by / reference'}] },
+    { id:'aadhaarCard',  name:'Aadhaar Card',                 fields:[{k:'number',label:'Aadhaar number'}] },
+    { id:'profilePhoto', name:'Profile Photo', image:true,    fields:[] },
+    { id:'dl',           name:'Driving Licence',              fields:[{k:'number',label:'Licence number'},{k:'expiry',label:'Expiry date',type:'date'}] },
+    { id:'police',       name:'Police Clearance Certificate', fields:[{k:'number',label:'Reference number'},{k:'expiry',label:'Valid till',type:'date'}] },
+    { id:'medical',      name:'Medical Fitness Certificate',  fields:[{k:'expiry',label:'Valid till',type:'date'}] },
+    { id:'pan',          name:'PAN Card',                     fields:[{k:'number',label:'PAN number'}] },
+    { id:'bank',         name:'Bank Passbook',                fields:[{k:'bank',label:'Bank name'},{k:'account',label:'Account number'},{k:'ifsc',label:'IFSC code'}] },
+    { id:'passport',     name:'Passport Photo', optional:true, image:true, fields:[] },
   ];
-  const DRIVER_DOCS_REQ = ['dl','pan','idproof','bank'];
+  const DRIVER_DOCS_REQ = ['emt','experience','aadhaarCard','profilePhoto','dl','police','medical','pan','bank'];
 
-  /* ambulance documents */
+  /* ambulance documents (per vehicle) */
   const VEHICLE_DOCS = [
-    { id:'rc',          name:'RC (Registration Certificate)', fields:[{k:'number',label:'RC number'},{k:'expiry',label:'Expiry date',type:'date'}] },
-    { id:'insurance',   name:'Insurance', fields:[{k:'number',label:'Policy number'},{k:'expiry',label:'Expiry date',type:'date'}] },
-    { id:'puc',         name:'PUC Certificate', fields:[{k:'number',label:'Certificate number'},{k:'expiry',label:'Expiry date',type:'date'}] },
-    { id:'roadtax',     name:'Road Tax Certificate', fields:[{k:'expiry',label:'Expiry date',type:'date'}] },
-    { id:'fitness',     name:'Fitness Certificate', fields:[{k:'expiry',label:'Expiry date',type:'date'}] },
-    { id:'calibration', name:'Calibration Certificate', aclsOnly:true, fields:[{k:'expiry',label:'Expiry date',type:'date'}] },
+    { id:'rc',        name:'RC (Registration Certificate)', fields:[{k:'number',label:'RC number'},{k:'expiry',label:'Expiry date',type:'date'}] },
+    { id:'insurance', name:'Insurance', fields:[{k:'number',label:'Policy number'},{k:'expiry',label:'Expiry date',type:'date'}] },
+    { id:'fitness',   name:'Fitness Certificate', fields:[{k:'expiry',label:'Expiry date',type:'date'}] },
+  ];
+
+  /* equipment checklist — dynamic by ambulance service class */
+  const EQUIPMENT = {
+    ACLS: ['Defibrillator / AED','Ventilator','Multi-para monitor','Oxygen cylinder + flowmeter','Suction apparatus','Infusion / syringe pump','Spine board & cervical collars','Emergency medication kit'],
+    BLS:  ['Oxygen cylinder + flowmeter','Suction apparatus','First-aid kit','Spine board & cervical collars','Stretcher & scoop','BP apparatus & pulse oximeter'],
+    Specialty: ['Stretcher / trolley','Storage / freezer unit','Basic first-aid kit'],
+  };
+  function equipFor(v) { return EQUIPMENT[v.serviceClass] || []; }
+  /* vehicle detail fields (registration, model, year, chassis, engine, expiries) */
+  const VEH_FIELDS = [
+    { k:'regNo',   label:'Registration number', ph:'e.g. KA01AB1234' },
+    { k:'year',    label:'Manufacture year', ph:'e.g. 2021', type:'number' },
+    { k:'chassis', label:'Chassis number (17 chars)', ph:'17-character VIN', max:17 },
+    { k:'engine',  label:'Engine number (11–17 chars)', ph:'Engine number', max:17 },
+    { k:'insExpiry', label:'Insurance expiry', type:'date' },
+    { k:'fitExpiry', label:'Fitness certificate expiry', type:'date' },
   ];
 
   /* ambulance variants → mapped to service class + short name */
@@ -1994,16 +2028,18 @@
   function nextDriverDocs() {
     const ok = DRIVER_DOCS_REQ.every(k => state.docs[k]?.uploaded);
     showNote('noteDocs', !ok);
-    if (ok) showScreen('reg-vehicle');
+    if (ok) showScreen('reg-ambulance');
   }
 
-  /* ---- step 3: ambulance details (number + type only) ---- */
+  /* ---- step 4: consolidated ambulance (details + equipment + docs + photos + videos) ---- */
   function addVehicle() {
     if (state.vehicles.length >= 2) { document.getElementById('limitNote').classList.add('show'); return; }
-    state.vehicles.push({ number:'', type:'', variant:'', serviceClass:'', shortName:'', docs:{}, photos:{}, videos:{} });
-    renderVehicleDetails();
+    state.vehicles.push({ number:'', type:'', variant:'', serviceClass:'', shortName:'',
+      regNo:'', year:'', chassis:'', engine:'', insExpiry:'', fitExpiry:'',
+      equipment:{}, docs:{}, photos:{}, videos:{} });
+    renderAmbulanceAccordion();
   }
-  function removeVehicle(i) { state.vehicles.splice(i,1); renderVehicleDetails(); }
+  function removeVehicle(i) { state.vehicles.splice(i,1); renderAmbulanceAccordion(); }
   function setVeh(i, field, val) { state.vehicles[i][field] = val; }
   function openVariantSheet(i) {
     const v = state.vehicles[i];
@@ -2026,72 +2062,79 @@
     const v = state.vehicles[i];
     v.variant = x.id; v.type = x.type; v.serviceClass = x.cls; v.shortName = x.short;
     closeSheet();
-    renderVehicleDetails();
+    renderAmbulanceAccordion(); openVehAcc(i);
   }
-  function renderVehicleDetails() {
-    document.getElementById('vehList').innerHTML = state.vehicles.map((v,i) => `
-      <div class="veh-card">
-        <div class="veh-head">
-          <div class="veh-title"><span class="dot">${i+1}</span> Ambulance ${i+1}</div>
-          ${state.vehicles.length>1?`<span class="veh-remove" onclick="removeVehicle(${i})">Remove</span>`:''}
-        </div>
-        <div class="field-group"><div class="mini-label">Vehicle number</div><input class="field sm" value="${v.number}" placeholder="e.g. KA01AB1234" oninput="setVeh(${i},'number',this.value)"></div>
-        <div class="field-group">
-          <div class="mini-label">Ambulance type</div>
-          <button class="type-select" onclick="openVariantSheet(${i})">
-            ${v.variant ? `<div class="ts-main">
-              <div class="ts-row"><span class="cls-badge ${v.serviceClass}">${v.serviceClass}</span><span class="ts-short">${v.shortName}</span></div>
-              <span class="ts-name">${v.type}</span>
-            </div>` : `<span class="ts-ph">Select ambulance type</span>`}
-            <span class="ts-chev">${chevIcon}</span>
-          </button>
-        </div>
-      </div>`).join('');
-    const n = state.vehicles.length;
-    document.getElementById('vehCounterText').textContent = `${n} of 2 vehicles added`;
-    document.getElementById('addVehBtn').disabled = n >= 2;
-    if (n < 2) document.getElementById('limitNote').classList.remove('show');
-  }
-  function nextVehicleDetails() {
-    const ok = state.vehicles.length > 0 && state.vehicles.every(v => v.number && v.type);
-    showNote('noteVeh', !ok);
-    if (ok) showScreen('reg-vehicle-docs');
-  }
+  function vehDocsFor(v) { return VEHICLE_DOCS.slice(); }
+  function videoSlotsFor(v) { return isACLS(v) ? [1,0] : [1]; } // siren (idx1) always; switch-on (idx0) only ACLS (ALS/Neonatal)
 
-  /* ---- step 4: ambulance documents (calibration only for ALS/ICU) ---- */
-  function vehDocsFor(v) { return VEHICLE_DOCS.filter(d => !d.aclsOnly || isACLS(v)); }
-  function renderVehicleDocs() {
-    const remaining = state.vehicles.reduce((n,v) => n + vehDocsFor(v).filter(d => !v.docs[d.id]?.uploaded).length, 0);
-    const soft = remaining > 0 ? `<div class="soft-note"><span class="sn-dot"></span>${remaining} required document${remaining>1?'s':''} remaining</div>` : '';
-    document.getElementById('vehDocList').innerHTML = soft + state.vehicles.map((v,i) => `
+  function photosHtml(i){ const v=state.vehicles[i]; v.photos=v.photos||{}; return `<div class="pu-list">${PHOTO_SLOTS.map((s,si)=>mediaRow('photo',i,si,s,v.photos[si])).join('')}</div>`; }
+  function videosHtml(i){ const v=state.vehicles[i]; v.videos=v.videos||{}; return `<div class="pu-list">${videoSlotsFor(v).map(si=>mediaRow('video',i,si,VIDEO_SLOTS[si],v.videos[si])).join('')}</div>`; }
+  function equipHtml(i){
+    const v=state.vehicles[i], list=equipFor(v);
+    if(!list.length) return `<div class="doc-sub" style="padding:2px 0 8px;">Select an ambulance type to load its equipment checklist.</div>`;
+    return list.map(name=>`<div class="check-item ${v.equipment[name]?'on':''}" onclick="toggleEquip(${i},&quot;${name.replace(/"/g,'&quot;')}&quot;)"><span class="check-box">${okIcon}</span><span>${name}</span></div>`).join('');
+  }
+  function toggleEquip(i,name){ const v=state.vehicles[i]; v.equipment[name]=!v.equipment[name]; const el=document.getElementById('equip_v'+i); if(el){el.innerHTML=equipHtml(i);refreshOpenHeight(i);} }
+  function renderVehDetailsHtml(i){
+    const v=state.vehicles[i];
+    const typeSel = `<div class="field-group"><div class="mini-label">Ambulance category / type</div>
+      <button class="type-select" onclick="openVariantSheet(${i})">
+        ${v.variant?`<div class="ts-main"><div class="ts-row"><span class="cls-badge ${v.serviceClass}">${v.serviceClass}</span><span class="ts-short">${v.shortName}</span></div><span class="ts-name">${v.type}</span></div>`:`<span class="ts-ph">Select ambulance type</span>`}
+        <span class="ts-chev">${chevIcon}</span>
+      </button></div>`;
+    const fields = VEH_FIELDS.map(f=>`<div class="field-group"><div class="mini-label">${f.label}</div>
+      <input class="field sm" ${f.type==='date'?'type="date"':''} ${f.type==='number'?'inputmode="numeric"':''} ${f.max?`maxlength="${f.max}"`:''} value="${v[f.k]||''}" ${f.ph?`placeholder="${f.ph}"`:''} oninput="setVeh(${i},'${f.k}',this.value)${f.k==='regNo'?`;setVeh(${i},'number',this.value)`:''}"></div>`).join('');
+    return typeSel + fields;
+  }
+  function renderVehPhotos(i){ const el=document.getElementById('pmedia_v'+i); if(el){el.innerHTML=photosHtml(i);refreshOpenHeight(i);} }
+  function renderVehVideos(i){ const el=document.getElementById('vmedia_v'+i); if(el){el.innerHTML=videosHtml(i);refreshOpenHeight(i);} }
+
+  function renderAmbulanceAccordion() {
+    const cont = document.getElementById('ambAccordion'); if (!cont) return;
+    cont.innerHTML = state.vehicles.map((v,i) => `
       <div class="acc-card" id="acc_v${i}">
         <div class="acc-head" onclick="toggleVehAcc(${i})">
           <div class="acc-row1">
             <span class="dot">${i+1}</span>
-            <span class="acc-id">${v.number||('Ambulance '+(i+1))}</span>
+            <span class="acc-id">${v.regNo||('Ambulance '+(i+1))}</span>
             ${v.serviceClass?`<span class="cls-badge ${v.serviceClass}">${v.serviceClass}</span>`:''}
-            ${v.shortName?`<span class="acc-short">${v.shortName}</span>`:''}
+            ${state.vehicles.length>1?`<span class="veh-remove" onclick="event.stopPropagation();removeVehicle(${i})">Remove</span>`:''}
             <span class="acc-chev">${chevIcon}</span>
           </div>
           <div class="acc-prog" id="prog_v${i}"></div>
         </div>
-        <div class="acc-body" id="body_v${i}">
-          <div class="acc-body-inner">
-            <div id="vdocs_v${i}">${vehDocsFor(v).map(d => docCard(d, v.docs, 'v'+i)).join('')}</div>
-          </div>
-        </div>
+        <div class="acc-body" id="body_v${i}"><div class="acc-body-inner">
+          <div class="sub-label">Vehicle details</div>
+          ${renderVehDetailsHtml(i)}
+          <div class="sub-label">Equipment checklist</div>
+          <div id="equip_v${i}">${equipHtml(i)}</div>
+          <div class="sub-label">Vehicle documents</div>
+          <div id="vdocs_v${i}">${vehDocsFor(v).map(d => docCard(d, v.docs, 'v'+i)).join('')}</div>
+          <div class="sub-label">Photos</div>
+          <div id="pmedia_v${i}">${photosHtml(i)}</div>
+          <div class="sub-label">Videos</div>
+          <div id="vmedia_v${i}">${videosHtml(i)}</div>
+        </div></div>
       </div>`).join('');
     state.vehicles.forEach((v,i) => updateVehProg(i));
-    // start with only the first ambulance expanded (rest header-only)
+    const n = state.vehicles.length;
+    document.getElementById('vehCounterText').textContent = `${n} of 2 ambulance${n>1?'s':''}`;
+    document.getElementById('addVehBtn').disabled = n >= 2;
+    if (n < 2) document.getElementById('limitNote').classList.remove('show');
     requestAnimationFrame(() => openVehAcc(0));
   }
   function updateVehProg(i) {
     const v = state.vehicles[i]; if (!v) return;
-    const docs = vehDocsFor(v);
-    const done = docs.filter(d => v.docs[d.id]?.uploaded).length;
     const el = document.getElementById('prog_v'+i); if (!el) return;
-    const pct = docs.length ? Math.round(done/docs.length*100) : 0, full = done===docs.length;
-    el.innerHTML = `<div class="mini-bar"><i class="${full?'full':''}" style="width:${pct}%"></i></div><span class="acc-prog-txt">${done} of ${docs.length} Uploaded</span>`;
+    // 5 sections: details, equipment, documents, photos, videos
+    const detailsOk = !!(v.regNo && v.variant && v.year && v.chassis && v.engine && v.insExpiry && v.fitExpiry);
+    const equipOk   = equipFor(v).length>0 && equipFor(v).every(n=>v.equipment[n]);
+    const docsOk    = vehDocsFor(v).every(d=>v.docs[d.id]?.uploaded);
+    const photosOk  = PHOTO_SLOTS.every((_,si)=>upIsDone(v.photos&&v.photos[si]));
+    const videosOk  = videoSlotsFor(v).every(si=>upIsDone(v.videos&&v.videos[si]));
+    const done = [detailsOk,equipOk,docsOk,photosOk,videosOk].filter(Boolean).length, total = 5;
+    const pct = Math.round(done/total*100), full = done===total;
+    el.innerHTML = `<div class="mini-bar"><i class="${full?'full':''}" style="width:${pct}%"></i></div><span class="acc-prog-txt">${done} of ${total} sections</span>`;
   }
   function accBody(i) { return document.getElementById('body_v'+i); }
   function openVehAcc(i) {
@@ -2113,10 +2156,19 @@
     const card = document.getElementById('acc_v'+i), body = accBody(i);
     if (card && card.classList.contains('open') && body) body.style.maxHeight = body.firstElementChild.scrollHeight + 'px';
   }
-  function nextVehicleDocs() {
-    const ok = state.vehicles.every(v => vehDocsFor(v).every(d => v.docs[d.id]?.uploaded));
-    showNote('noteVehDocs', !ok);
-    if (ok) showScreen('reg-photos');
+  function vehComplete(v){
+    const detailsOk = v.regNo && v.variant && v.year && v.chassis && v.chassis.length===17
+      && v.engine && v.engine.length>=11 && v.engine.length<=17 && v.insExpiry && v.fitExpiry;
+    const equipOk  = equipFor(v).length>0 && equipFor(v).every(n=>v.equipment[n]);
+    const docsOk   = vehDocsFor(v).every(d=>v.docs[d.id]?.uploaded);
+    const photosOk = PHOTO_SLOTS.every((_,si)=>upIsDone(v.photos&&v.photos[si]));
+    const videosOk = videoSlotsFor(v).every(si=>upIsDone(v.videos&&v.videos[si]));
+    return detailsOk && equipOk && docsOk && photosOk && videosOk;
+  }
+  function nextAmbulance() {
+    const ok = state.vehicles.length > 0 && state.vehicles.every(vehComplete);
+    showNote('noteAmbStep', !ok);
+    if (ok) { renderReview(); showScreen('reg-review'); }
   }
 
   /* ---- upload states shared by photos + videos ---- */
@@ -2133,7 +2185,7 @@
     if (kind==='photo') return (v.photos = v.photos || {});
     return (v.videos = v.videos || {});
   }
-  function upRender(kind) { kind==='photo' ? renderPhotos() : renderVideos(); }
+  function upRender(kind) { state.vehicles.forEach((_,i)=> { kind==='photo'?renderVehPhotos(i):renderVehVideos(i); updateVehProg(i); }); }
   function upIsDone(e) { return e && e.status==='done'; }
 
   function pickFile(kind,i,si) {
@@ -2221,39 +2273,6 @@
     const errLine = (err && st!=='failed') ? `<div class="pu-error">${err}</div>` : '';
     const clickAttr = st==='done' ? ` onclick="openMediaSheet('${kind}',${i},${si})" style="cursor:pointer"` : '';
     return `<div class="pu-cell"><div class="pu-item ${st}"${clickAttr}>${thumb}<div class="pu-main"><div class="pu-name">${label}</div>${status}</div><div class="pu-act">${action}</div></div>${errLine}</div>`;
-  }
-  function renderPhotos() {
-    document.getElementById('photoList').innerHTML = state.vehicles.map((v,i) => {
-      v.photos = v.photos || {};
-      return `<div class="veh-card pu-card">
-        <div class="veh-title"><span class="dot">${i+1}</span> ${v.number||('Ambulance '+(i+1))}</div>
-        <div class="veh-docs-label">Vehicle photos</div>
-        <div class="pu-list">${PHOTO_SLOTS.map((s,si)=>mediaRow('photo',i,si,s,v.photos[si])).join('')}</div>
-      </div>`;
-    }).join('');
-  }
-  function nextPhotos() {
-    const ok = state.vehicles.every(v => PHOTO_SLOTS.every((_,si) => upIsDone(v.photos && v.photos[si])));
-    showNote('notePhotos', !ok);
-    if (ok) showScreen(hasACLS() ? 'reg-videos' : 'reg-review');
-  }
-
-  /* ---- step 6: functional videos (ALS/ICU only) ---- */
-  function renderVideos() {
-    const acls = state.vehicles.map((v,i)=>({v,i})).filter(o => isACLS(o.v));
-    document.getElementById('videoList').innerHTML = acls.length ? acls.map(({v,i}) => {
-      v.videos = v.videos || {};
-      return `<div class="veh-card pu-card">
-        <div class="veh-title"><span class="dot">${i+1}</span> ${v.number||('Ambulance '+(i+1))} · ${v.shortName||v.type}</div>
-        <div class="veh-docs-label">Functional videos</div>
-        <div class="pu-list">${VIDEO_SLOTS.map((s,si)=>mediaRow('video',i,si,s,v.videos[si])).join('')}</div>
-      </div>`;
-    }).join('') : '<div class="doc-sub" style="text-align:center;padding:24px;">No ALS / ICU ambulances — no videos required.</div>';
-  }
-  function nextVideos() {
-    const ok = state.vehicles.filter(v=>isACLS(v)).every(v => VIDEO_SLOTS.every((_,si) => upIsDone(v.videos && v.videos[si])));
-    showNote('noteVideos', !ok);
-    if (ok) goReview();
   }
 
   /* ============ RIDE TRIP TIMER (patient pickup → hospital) ============ */
@@ -2466,42 +2485,111 @@
     el.parentNode.querySelectorAll('.seg').forEach(s=>s.classList.remove('on'));
     el.classList.add('on'); state.personal[field] = val;
   }
+  const val = id => (document.getElementById(id)?.value || '').trim();
+  function setErr(id, msg){ const e = document.getElementById(id); if (e){ e.textContent = msg||''; e.classList.toggle('show', !!msg); } }
+  function ageFrom(dob){ const d=new Date(dob), n=new Date(); let a=n.getFullYear()-d.getFullYear(); const m=n.getMonth()-d.getMonth(); if(m<0||(m===0&&n.getDate()<d.getDate())) a--; return a; }
+
+  function pickGender(el, g){
+    el.parentNode.querySelectorAll('.seg').forEach(s=>s.classList.remove('on'));
+    el.classList.add('on'); state.personal.gender = g; checkStep1();
+  }
+  function step1Valid(){
+    const name = val('r_name'), dob = val('r_dob'), exp = parseInt(val('r_exp'),10);
+    return !!name && !!dob && ageFrom(dob) >= 21 && !isNaN(exp) && exp >= 2 && !!state.personal.gender;
+  }
+  function checkStep1(){ const b = document.getElementById('btnStep1'); if (b) b.disabled = !step1Valid(); }
+
   function saveStep1() {
-    state.personal.name  = document.getElementById('r_name').value;
-    state.personal.email = document.getElementById('r_email').value;
-    state.personal.city  = document.getElementById('r_city').value;
-    state.personal.dob   = document.getElementById('r_dob').value;
-    showScreen('reg-docs');
+    const p = state.personal;
+    p.name = val('r_name'); p.email = val('r_email'); p.dob = val('r_dob'); p.experience = val('r_exp');
+    let ok = true;
+    if (!p.name) { setErr('err_name','Full name is required'); ok=false; } else setErr('err_name','');
+    if (!p.dob) { setErr('err_dob','Date of birth is required'); ok=false; }
+    else if (ageFrom(p.dob) < 21) { setErr('err_dob','Driver must be at least 21 years old'); ok=false; } else setErr('err_dob','');
+    const exp = parseInt(p.experience,10);
+    if (p.experience==='' || isNaN(exp)) { setErr('err_exp','Years of experience is required'); ok=false; }
+    else if (exp < 2) { setErr('err_exp','Minimum 2 years of experience required'); ok=false; } else setErr('err_exp','');
+    if (!p.gender) { setErr('err_gender','Please select gender'); ok=false; } else setErr('err_gender','');
+    if (ok) showScreen('reg-credentials');
+  }
+
+  /* ---- step 2: credentials ---- */
+  function toggleCat(el, name){
+    const c = state.credentials; c.categories = c.categories || [];
+    const idx = c.categories.indexOf(name);
+    if (idx>=0){ c.categories.splice(idx,1); el.classList.remove('on'); }
+    else { c.categories.push(name); el.classList.add('on'); }
+    checkCred();
+  }
+  function fmtAadhaar(el){
+    const d = el.value.replace(/\D/g,'').slice(0,12);
+    el.value = d.replace(/(\d{4})(?=\d)/g,'$1 ');
+  }
+  function credValid(){
+    const lic = val('c_licence'), exp = val('c_licexp'), aad = val('c_aadhaar').replace(/\D/g,''), blood = val('c_blood');
+    return lic.length===15 && !!exp && (state.credentials.categories||[]).length>0 && aad.length===12 && !!blood;
+  }
+  function checkCred(){ const b = document.getElementById('btnCred'); if (b) b.disabled = !credValid(); }
+
+  function saveCredentials(){
+    const c = state.credentials;
+    c.licence = val('c_licence'); c.licenceExpiry = val('c_licexp'); c.aadhaar = val('c_aadhaar').replace(/\D/g,''); c.blood = val('c_blood');
+    let ok = true;
+    if (c.licence.length !== 15) { setErr('err_licence','Licence number must be exactly 15 characters'); ok=false; } else setErr('err_licence','');
+    if (!c.licenceExpiry) { setErr('err_licexp','Licence expiry date is required'); ok=false; } else setErr('err_licexp','');
+    if (!c.categories || !c.categories.length) { setErr('err_categories','Select at least one licence category'); ok=false; } else setErr('err_categories','');
+    if (c.aadhaar.length !== 12) { setErr('err_aadhaar','Aadhaar number must be 12 digits'); ok=false; } else setErr('err_aadhaar','');
+    if (!c.blood) { setErr('err_blood','Please select blood group'); ok=false; } else setErr('err_blood','');
+    if (ok) showScreen('reg-docs');
   }
 
   /* ---- review + submit ---- */
   function setPrimary(i) { state.primary = i; renderReview(); }
   function goReview() { renderReview(); showScreen('reg-review'); }
-  function backFromReview() { showScreen(hasACLS() ? 'reg-videos' : 'reg-photos'); }
+  function backFromReview() { showScreen('reg-ambulance'); }
+  function submitRegistration() { showScreen('pending'); }
   function renderReview() {
-    const p = state.personal;
+    const p = state.personal, c = state.credentials;
     const row = (k,v)=>`<div class="sum-row"><span class="k">${k}</span><span class="v">${v||'—'}</span></div>`;
-    let html = `
+    const missing = [];
+    if (!(p.name && p.dob && p.experience && p.gender)) missing.push('Personal details');
+    if (!(c.licence?.length===15 && c.licenceExpiry && c.categories?.length && c.aadhaar?.length===12 && c.blood)) missing.push('Credentials');
+    const docsMissing = DRIVER_DOCS_REQ.filter(k=>!state.docs[k]?.uploaded);
+    if (docsMissing.length) missing.push(docsMissing.length+' driver document(s)');
+    if (!state.vehicles.length) missing.push('At least one ambulance');
+    state.vehicles.forEach((v,i)=>{ if(!vehComplete(v)) missing.push('Ambulance '+(i+1)+' incomplete'); });
+
+    let html = '';
+    if (missing.length) {
+      html += `<div class="card" style="background:#FDEDEC;border-color:#F5C6C2;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:700;color:#C0392B;margin-bottom:6px;">Complete these before submitting</div>
+        ${missing.map(m=>`<div style="font-size:12.5px;color:#9A3412;padding:3px 0;">• ${m}</div>`).join('')}</div>`;
+    } else {
+      html += `<div class="card" style="background:#EEF9F0;border-color:#BBE5C4;margin-bottom:12px;display:flex;align-items:center;gap:9px;">
+        <span style="color:#1F9D4D;">${okIcon}</span><div style="font-size:13px;font-weight:700;color:#1F7A3D;">All sections complete — ready to submit</div></div>`;
+    }
+    html += `
       <div class="sum-card">
         <div class="sum-top"><div class="sum-check">${okIcon}</div><div class="sum-title">Personal Details</div><span class="sum-edit" onclick="showScreen('registration')">Edit</span></div>
-        ${row('Name', p.name)}${row('Mobile', state.mobile)}${row('Email', p.email)}${row('City', p.city)}${row('Date of birth', p.dob)}${row('Gender', p.gender)}
+        ${row('Name', p.name)}${row('Mobile', state.mobile)}${row('Email', p.email)}${row('Date of birth', p.dob)}${row('Experience', p.experience?p.experience+' yrs':'')}${row('Gender', p.gender)}
+      </div>
+      <div class="sum-card">
+        <div class="sum-top"><div class="sum-check">${okIcon}</div><div class="sum-title">Credentials</div><span class="sum-edit" onclick="showScreen('reg-credentials')">Edit</span></div>
+        ${row('Licence no.', c.licence)}${row('Licence expiry', c.licenceExpiry)}${row('Categories', (c.categories||[]).join(', '))}${row('Aadhaar', c.aadhaar)}${row('Blood group', c.blood)}
       </div>
       <div class="sum-card">
         <div class="sum-top"><div class="sum-check">${okIcon}</div><div class="sum-title">Driver Documents</div><span class="sum-edit" onclick="showScreen('reg-docs')">Edit</span></div>
-        ${DRIVER_DOCS.map(d=>row(d.name + (d.id==='idproof'&&state.docs.idproof?.choice?` (${state.docs.idproof.choice})`:''), state.docs[d.id]?.uploaded?'Uploaded':(d.optional?'Skipped':'Pending'))).join('')}
+        ${DRIVER_DOCS.map(d=>row(d.name, state.docs[d.id]?.uploaded?'Uploaded':(d.optional?'Skipped':'Pending'))).join('')}
       </div>`;
     state.vehicles.forEach((v,i)=>{
-      const acls = isACLS(v);
-      const docsTotal = vehDocsFor(v).length;
-      const docsUp = vehDocsFor(v).filter(d=>v.docs[d.id]?.uploaded).length;
-      const photos = Object.values(v.photos||{}).filter(upIsDone).length;
-      const vids = Object.values(v.videos||{}).filter(upIsDone).length;
+      const docsUp = vehDocsFor(v).filter(d=>v.docs[d.id]?.uploaded).length, docsTot = vehDocsFor(v).length;
+      const photos = PHOTO_SLOTS.filter((_,si)=>upIsDone(v.photos&&v.photos[si])).length;
+      const vids   = videoSlotsFor(v).filter(si=>upIsDone(v.videos&&v.videos[si])).length;
+      const eq     = equipFor(v).filter(n=>v.equipment[n]).length, eqTot = equipFor(v).length;
       html += `<div class="sum-card">
-        <div class="sum-top"><div class="sum-check">${okIcon}</div><div class="sum-title">Ambulance ${i+1}</div><span class="sum-edit" onclick="showScreen('reg-vehicle')">Edit</span></div>
-        ${row('Vehicle number', v.number)}${row('Ambulance type', v.type)}${row('Service class', v.serviceClass)}${row('Short name', v.shortName)}
-        ${row('Documents', docsUp+' / '+docsTotal+' uploaded')}
-        ${row('Photos', photos+' / '+PHOTO_SLOTS.length)}
-        ${acls?row('Videos', vids+' / '+VIDEO_SLOTS.length):''}
+        <div class="sum-top"><div class="sum-check">${okIcon}</div><div class="sum-title">Ambulance ${i+1}</div><span class="sum-edit" onclick="showScreen('reg-ambulance')">Edit</span></div>
+        ${row('Registration', v.regNo)}${row('Type', v.shortName||v.type)}${row('Chassis', v.chassis)}${row('Engine', v.engine)}
+        ${row('Equipment', eq+' / '+eqTot)}${row('Documents', docsUp+' / '+docsTot)}${row('Photos', photos+' / '+PHOTO_SLOTS.length)}${row('Videos', vids+' / '+videoSlotsFor(v).length)}
       </div>`;
     });
     if (state.vehicles.length === 2) {
@@ -2520,12 +2608,11 @@
   const origShow = showScreen;
   showScreen = function(id) {
     if (id === 'otp') document.getElementById('otpNumber').textContent = state.mobile;
-    if (id === 'registration') document.getElementById('r_mobile').value = state.mobile;
+    if (id === 'registration') { document.getElementById('r_mobile_txt').textContent = state.mobile; checkStep1(); }
+    if (id === 'reg-credentials') checkCred();
     if (id === 'reg-docs')    renderDriverDocs();
-    if (id === 'reg-vehicle') { if (state.vehicles.length === 0) addVehicle(); else renderVehicleDetails(); }
-    if (id === 'reg-vehicle-docs') renderVehicleDocs();
-    if (id === 'reg-photos')  renderPhotos();
-    if (id === 'reg-videos')  renderVideos();
+    if (id === 'reg-ambulance') { if (state.vehicles.length === 0) addVehicle(); else renderAmbulanceAccordion(); }
+    if (id === 'reg-review')  renderReview();
     if (id === 'dashboard') {
       document.getElementById('dashSheet')?.classList.remove('expanded');
       const a = document.getElementById('dashAmb');
@@ -2621,10 +2708,9 @@
       ['Correction Required','login',{type:'correctionRequired'}],
     ]},
     { sec:'Registration Steps', items:[
-      ['1 · Personal','registration'], ['2 · Driver Docs','reg-docs'],
-      ['3 · Ambulance Details','reg-vehicle'], ['4 · Ambulance Docs','reg-vehicle-docs'],
-      ['5 · Vehicle Photos','reg-photos'], ['6 · Functional Videos','reg-videos'],
-      ['Review & Submit','reg-review'],
+      ['1 · Personal','registration'], ['2 · Credentials','reg-credentials'],
+      ['3 · Driver Documents','reg-docs'], ['4 · Ambulance Details','reg-ambulance'],
+      ['5 · Review','reg-review'],
     ]},
     { sec:'Registration States', items:[
       ['Pending Verification','pending'], ['Correction Required','correction'],
